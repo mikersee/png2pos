@@ -1,0 +1,89 @@
+.TH png2pos 1 "December 2014" "version 1.5.3"
+
+.SH NAME
+.B png2pos
+is a utility to convert PNG images to ESC/POS format — binary format used by POS thermal printers. Output file can be just sent to printer.
+
+.SH SYNOPSIS
+.B png2pos
+[-V] [-h] [-c] [-a L|C|R] [-r] [-o FILE] input files
+
+.SH DESCRIPTION
+.B png2pos
+is a utility to convert PNG images to ESC/POS format used by POS thermal printers. Output file can be just sent to printer.
+.P
+It accepts any PNG file (B/W, greyscale, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap in ESC/POS format.
+.B png2pos
+prepends needed printer initialization binary sequences and adds paper cutoff command if requested.
+.P
+.B png2pos
+utilizes mainly F50 and F112 ESC/POS commands.
+
+.SH OPTIONS
+.IP "\-V"
+display the version number and exit
+
+.IP "\-h"
+display this short help and exit
+
+.IP "\-c"
+cut the paper at the end of job
+
+.IP "\-a L|C|R"
+horizontal image alignment (Left, Center, Right)
+
+.IP "\-r"
+rotate image upside down before it is printed
+
+.IP "\-o FILE"
+output file
+.nf
+With no FILE, or when FILE is -, write to standard output
+
+.SH "EXIT STATUS"
+.B png2pos
+uses a common convention of zero (0) for success and non-zero (> 0) for error.
+
+.SH EXAMPLES
+Command
+.P
+.RS
+.nf
+png2pos -o /dev/usb/lp0 -c -r -a R /tmp/lena.png /tmp/text.png
+.fi
+.RE
+.P
+will convert files lena.png and text.png into ESC/POS format. Output will be sent directly to printer (/dev/usb/lp0).
+Images will be rotated by 180 degrees and right-aligned. At the end of job paper will be cut off.
+
+.SH BUGS
+No known bugs.
+
+.SH REPORTING BUGS
+Bug reports can be seen and new bugs could be reported at https://github.com/petrkutalek/png2pos/issues
+
+.SH AUTHOR
+.B png2pos
+has been written by Petr Kutalek from
+.B Forers, s. r. o.,
+company <info@forers.com>.
+
+.SH WWW
+https://github.com/petrkutalek/png2pos
+
+.SH COPYRIGHT
+Licensed under the MIT License:
+.P
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+.P
+- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+.P
+- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+.P
+(c) 2012 - 2014 Petr Kutalek: png2pos
+
+.P
+Some portions:
+.br
+(c) 2005 - 2014 Lode Vandevenne: LodePNG

@@ -1,0 +1,16 @@
+# Mac OS X
+.DS_Store
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# C
+*.o
+*.a
+
+# Documents
+debug_*
+*.pos
+png2Pos
+*.1.gz
