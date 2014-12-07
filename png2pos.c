@@ -26,6 +26,10 @@ subject to the following conditions:
 #include <getopt.h>
 #include "lodepng.h"
 
+#ifdef DEBUG
+#include <mcheck.h>
+#endif
+
 const char *PNG2POS_VERSION = "1.5.3";
 const char *PNG2POS_BUILTON = __DATE__;
 
@@ -88,6 +92,10 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
     }
+
+    #ifdef DEBUG
+    mtrace();
+    #endif
 
     unsigned char *img_rgba = NULL;
     unsigned char *img_grey = NULL;
@@ -386,6 +394,10 @@ fail:
     if (fout != NULL && fout != stdout) {
        fclose(fout), fout = NULL;
     }
+
+    #ifdef DEBUG
+    muntrace();
+    #endif
 
     return ret;
 }

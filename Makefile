@@ -1,5 +1,7 @@
 CC := gcc
-CFLAGS += -std=c99 -O2 -Wall -pedantic -D_POSIX_C_SOURCE=200112L \
+CFLAGS += -std=c99 -O2 -Wall -pedantic \
+	-D_POSIX_C_SOURCE=200112L \
+	-D_FILE_OFFSET_BITS=64 \
 	-DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS \
 	-DLODEPNG_NO_COMPILE_CPP \
 	-DLODEPNG_NO_COMPILE_ALLOCATORS \
@@ -34,7 +36,7 @@ $(EXEC) : $(OBJS)
 rpi : CFLAGS += -march=armv6j -mfpu=vfp -mfloat-abi=hard
 rpi : strip
 
-debug : CFLAGS += -DDEBUG -DLODEPNG_COMPILE_ENCODER
+debug : CFLAGS += -g -DDEBUG -DLODEPNG_COMPILE_ENCODER
 debug : all
 
 profiled :
