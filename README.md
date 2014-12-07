@@ -59,6 +59,7 @@ option | value | meaning
 -c | | cut the paper at the end of job
 -a | L,C,R | horizontal image alignment (Left, Center, Right)
 -r | | rotate image upside down before it is printed
+-p | | pre-process the images
 -o | FILE | output file
 
 With no FILE, or when FILE is -, write to standard output.

@@ -51,11 +51,13 @@ const unsigned int PAPER_WIDTH = 512u;
 
 struct {
     unsigned int cut;
+    unsigned int photo;
     char align;
     unsigned int rotate;
     const char *output;
 } config = {
     .cut = 0,
+    .photo = 0,
     .align = 'L',
     .rotate = 0,
     .output = NULL
@@ -107,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     opterr = 0;
     int optc = -1;
-    while ((optc = getopt(argc, argv, ":Vhca:ro:")) != -1) {
+    while ((optc = getopt(argc, argv, ":Vhca:rpo:")) != -1) {
         switch (optc) {
             case 'o':
                 config.output = optarg;
@@ -129,6 +131,10 @@ int main(int argc, char *argv[]) {
                 config.rotate = 1;
                 break;
 
+            case 'p':
+                config.photo = 1;
+                break;
+
             case 'V':
                 fprintf(stderr, "%s %s (%s)\n", BINARY_NAME, PNG2POS_VERSION, PNG2POS_BUILTON);
                 fprintf(stderr, "%s %s\n", "LodePNG", LODEPNG_VERSION_STRING);
@@ -138,13 +144,14 @@ int main(int argc, char *argv[]) {
             case 'h':
                 fprintf(stderr,
                     "png2pos is a utility to convert PNG to ESC/POS binary format for EPSON TM-T70 printer\n"
-                    "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-o FILE] input files\n"
+                    "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-p] [-o FILE] input files\n"
                     "\n"
                     "  -V          display the version number and exit\n"
                     "  -h          display this short help and exit\n"
                     "  -c          cut the paper at the end of job\n"
                     "  -a L|C|R    horizontal image alignment (Left, Center, Right)\n"
                     "  -r          rotate image upside down before it is printed\n"
+                    "  -p          pre-process the images\n"
                     "  -o FILE     output file\n"
                     "\n"
                     "With no FILE, or when FILE is -, write to standard output\n"
@@ -239,16 +246,13 @@ int main(int argc, char *argv[]) {
 
         free(img_rgba), img_rgba = NULL;
 
-        // do not pre-process b&w images
-        const unsigned int img_is_bw = (histogram[0] + histogram[255]) == img_grey_size;
-
         #ifdef DEBUG
         lodepng_encode_file("./debug_g.png", img_grey, img_w, img_h, LCT_GREY, 8);
         #endif
 
         // post-processing
         // convert to B/W bitmap
-        if (!img_is_bw) {
+        if (config.photo) {
             // Histogram Equalization Algorithm
             for (unsigned int i = 1; i != 256; ++i) {
                 histogram[i] += histogram[i - 1];
