@@ -22,7 +22,7 @@ strip : $(EXEC)
 .PHONY : clean
 clean :
 	-rm -f $(OBJS) $(EXEC)
-	-rm *.pos *.gz
+	-rm *.pos *.gz debug_*.png
 
 $(EXEC) : $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)
