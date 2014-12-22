@@ -1,4 +1,4 @@
-CC := gcc
+CC ?= gcc
 CFLAGS += -std=c99 -O2 -Wall -pedantic \
 	-D_POSIX_C_SOURCE=200112L \
 	-D_FILE_OFFSET_BITS=64 \

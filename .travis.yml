@@ -1,0 +1,15 @@
+language: c
+compiler:
+  - clang
+  - gcc
+sudo: false
+script: make
+branches:
+  except:
+    - dh-pages
+notifications:
+  email:
+    recipients:
+      - petr@kutalek.cz
+    on_success: always
+    on_failure: always
