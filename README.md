@@ -19,7 +19,7 @@ png2pos is:
 ## Pricing and Support
 
 png2pos is free MIT-licensed software provided as is. *Unfortunately I am unable
-to provide you with free support* and do not accept pull requests.
+to provide you with free support*.
 
 If you like png2pos and use it, please let me know, it motivates me in further development.
 
@@ -80,6 +80,9 @@ png2pos accepts any PNG file (B/W, greyscale, RGBA), converts it to B/W bitmap
 in ESC/POS format and prepends and adds other command sequences such as printer
 initialization and paper cut. png2pos utilizes F50 and F112 ESC/POS commands.
 
+png2pos requires 5 × WIDTH × HEIGHT bytes of RAM. (E.g. to process image of receipt 
+768 pixels tall you need about 2 MiB of RAM.)
+
 ### Examples
 
 #### Lena
@@ -99,17 +102,5 @@ Produced B/W dithered version (Atkinson Dithering Algorithm)
 
 ![B/W](_docs/lena_png2pos_3_bw.png)
 
-#### Hawkes Bay
-Greyscale version
-
-![grey](_docs/bay_png2pos_1_grey.png)
-
-Post-processed version (Histogram Equalization Algorithm)
-
-![post-processed](_docs/bay_png2pos_2_pp.png)
-
-Produced B/W dithered version (Atkinson Dithering Algorithm)
-
-![B/W](_docs/bay_png2pos_3_bw.png)
 
 ![.](https://forers.com/tmp/empty.gif)

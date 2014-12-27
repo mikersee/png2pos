@@ -1,5 +1,5 @@
 /*!
-(c) 2012-2014 Petr Kutalek: png2pos
+(c) 2012 - 2015 Petr Kutalek: png2pos
 
 Licensed under the MIT License:
 
@@ -30,7 +30,7 @@ subject to the following conditions:
 #include <mcheck.h>
 #endif
 
-const char *PNG2POS_VERSION = "1.5.3";
+const char *PNG2POS_VERSION = "1.5.4";
 const char *PNG2POS_BUILTON = __DATE__;
 
 // modified lodepng allocators
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
                     "\n"
                     "Please read the manual page (man %s)\n"
                     "Report bugs to Petr Kutalek <petr@kutalek.cz>\n"
-                    "(c) Petr Kutalek <petr@kutalek.cz>, 2012 - 2014, Licensed under the MIT license\n"
+                    "(c) Petr Kutalek <petr@kutalek.cz>, 2012 - 2015, Licensed under the MIT license\n"
                     ,
                     BINARY_NAME, BINARY_NAME
                 );
