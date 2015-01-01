@@ -33,6 +33,13 @@ $(EXEC) : $(OBJS)
 %.1.gz : %.1
 	gzip -c -9 $< > $@
 
+static : CFLAGS += -static
+static : LDFLAGS += -static
+static : all
+# This option will not work on Mac OS X unless all libraries (including libgcc.a)
+# have also been compiled with -static. Since neither a static version of libSystem.dylib
+# nor crt0.o are provided, this option is not useful to most people.
+
 rpi : CFLAGS += -march=armv6j -mfpu=vfp -mfloat-abi=hard
 rpi : strip
 

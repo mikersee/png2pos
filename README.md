@@ -25,28 +25,66 @@ If you like png2pos and use it, please let me know, it motivates me in further d
 
 Important: png2pos will *never ever* be like Emacs; it is simple and specialized utility.
 
+## Precompiled binary packages
+
+You can find precompiled binary packages for some common platforms in [Releases](https://github.com/petrkutalek/png2pos/releases) section.
+
+Please, if you use GPG, verify also attached GPG signature:
+
+Import public key into temporary keyring (you can import it into your permanent keyring of course) and verify ZIP file's ASC signature:
+
+    $ wget -O - https://forers.com/494CD31C.asc | gpg --no-default-keyring --keyring ./gpg-png2pos.tmp --import ↵
+    gpg: key 494CD31C: public key "Petr Kutalek <petr.kutalek@forers.com>" imported
+    gpg: Total number processed: 1
+    gpg: imported: 1 (RSA: 1)
+
+    $ gpg --no-default-keyring --keyring ./gpg-png2pos.tmp --verify png2pos-v1.5.4-rpi.zip.asc ↵
+    gpg: Signature made Thu Jan 1 20:42:13 2015 CET using RSA key ID 494CD31C
+    gpg: Good signature from "Petr Kutalek <petr.kutalek@forers.com>"
+    gpg: WARNING: This key is not certified with a trusted signature!
+    gpg: There is no indication that the signature belongs to the owner.
+    Primary key fingerprint: 06EB BE07 4850 3817 8533 B45D C1D9 23EB 494C D31C
+
+    $ rm ./gpg-png2pos.*
+
 ## Build
 
-To build binary just type:
+If you prefer to build binary file yourself, clone the source code:
 
-    $ make ↵
+    $ git clone https://github.com/petrkutalek/png2pos.git ↵
+    $ cd png2pos ↵
+    $ git submodule init ↵
+    $ git submodule update ↵
+
+To build and install binary just type:
+
+    $ make install-strip ↵
 
 On Mac typically you can use clang preprocessor:
 
-    $ make CC=clang ↵
+    $ make CC=clang install-strip ↵
+
+On Linux you can also build static binary (e.g. also based on [musl](http://www.musl-libc.org/intro.html)):
+
+    $ make CC=/usr/local/musl/bin/musl-gcc static ↵
+    $ make install-strip ↵
+
+Please note that musl does not support GMon (debug target).
 
 ### Available make targets
 
 target | make will build…
 :----- | :------
-  | png2pos
+(empty)  | png2pos
 clean | (removes intermediate products)
 man | compressed man page
 strip | stripped version (suggested)
 profiled | profiled version (up to 3 % performance gain on repeat tasks)
-install | install png2pos into /usr/local…
-debug | debug version (creates PNG temp files after each step during input processing)
+install | install png2pos into PREFIX (default /usr/local)
+install-strip | install stripped version into PREFIX (default /usr/local)
+debug | debug version (creates PNG temp file after each step in processing chain)
 rpi | Raspberry Pi optimized version
+static | static binary (does not work on OS X, see [Makefile](./Makefile#L39:L41))
 
 png2pos has no lib dependencies and is easy to build and run on Linux, Mac and Windows.
 
@@ -67,12 +105,6 @@ With no FILE, or when FILE is -, write to standard output.
 ## Usage examples
 
     $ png2pos -c -r -a R /tmp/*.png > /dev/usb/lp0 ↵
-    $ _
-
-    $ png2pos -V ↵
-    png2pos 1.5.3 (Dec  5 2014)
-    LodePNG 20141130
-    $ _
 
 ## How does it work?
 
@@ -102,5 +134,3 @@ Produced B/W dithered version (Atkinson Dithering Algorithm)
 
 ![B/W](_docs/lena_png2pos_3_bw.png)
 
-
-![.](https://forers.com/tmp/empty.gif)
