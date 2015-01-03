@@ -90,7 +90,8 @@ install | install png2pos into PREFIX (default /usr/local)
 install-strip | install stripped version into PREFIX (default /usr/local)
 debug | debug version (creates PNG temp file after each step in processing chain)
 rpi | Raspberry Pi optimized version
-static | static binary (does not work on OS X, see [Makefile](./Makefile#L39:L41))
+static | static binary (does not work on OS X, see [Makefile](./Makefile#L42:L44))
+analyze | clang static analyzer (OS X)
 
 png2pos has no lib dependencies and is easy to build and run on Linux, Mac and Windows.
 

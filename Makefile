@@ -33,6 +33,9 @@ $(EXEC) : $(OBJS)
 %.1.gz : %.1
 	gzip -c -9 $< > $@
 
+analyze : png2pos.c
+	clang --analyze -Xanalyzer -analyzer-output=text $(CFLAGS) $<
+
 static : CFLAGS += -static
 static : LDFLAGS += -static
 static : all
