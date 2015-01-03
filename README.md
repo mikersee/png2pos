@@ -3,8 +3,6 @@
 png2pos is a utility to convert PNG images to ESC/POS format — binary format used
 by POS thermal printers. Output file can be just sent to printer.
 
-![TMT-70](_docs/epson-tmt70.jpg)
-
 png2pos is:
 
 * **free** and open-source
@@ -15,6 +13,14 @@ png2pos is:
 * multiplatform (tested on Linux — x86 and ARM/Raspberry Pi, OS X and Windows)
 * well **tested**
 * 100% handcrafted in Prague, CZ :-)
+
+## Compatibility
+
+png2pos conforms to ESC/POS language used by these printers:
+
+* Epson TM-T70 (tested)
+* Epson TM-T88IV
+* Epson TM-T90
 
 ## Pricing and Support
 
@@ -120,17 +126,17 @@ png2pos requires 5 × WIDTH × HEIGHT bytes of RAM. (E.g. to process image of re
 #### Lena
 Original
 
-![original](_docs/lena_png2pos_0_original.png)
+![original](docs/lena_png2pos_0_original.png)
 
 Greyscale version
 
-![grey](_docs/lena_png2pos_1_grey.png)
+![grey](docs/lena_png2pos_1_grey.png)
 
 Post-processed version (Histogram Equalization Algorithm)
 
-![post-processed](_docs/lena_png2pos_2_pp.png)
+![post-processed](docs/lena_png2pos_2_pp.png)
 
 Produced B/W dithered version (Atkinson Dithering Algorithm)
 
-![B/W](_docs/lena_png2pos_3_bw.png)
+![B/W](docs/lena_png2pos_3_bw.png)
 
