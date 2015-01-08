@@ -1,4 +1,6 @@
-# png2pos [![Build Status](https://travis-ci.org/petrkutalek/png2pos.svg?branch=master)](https://travis-ci.org/petrkutalek/png2pos)
+# png2pos
+[![Build Status](https://travis-ci.org/petrkutalek/png2pos.svg?branch=master)](https://travis-ci.org/petrkutalek/png2pos)
+[![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TNCBPJT2R4MC)
 
 png2pos is a utility to convert PNG images to ESC/POS format — binary format used
 by POS thermal printers. Output file can be just sent to printer.
