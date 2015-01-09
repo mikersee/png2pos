@@ -51,7 +51,7 @@ debug : all
 
 profiled :
 	make CFLAGS="$(CFLAGS) -fprofile-generate" $(EXEC)
-	find ./samples -type f -exec ./$(EXEC) -o test.pos -c -r -a c {} \;
+	find . -type f -exec ./$(EXEC) -o /dev/null -c -r -a c {} \;
 	-rm *.pos
 	make clean
 	make CFLAGS="$(CFLAGS) -fprofile-use" strip

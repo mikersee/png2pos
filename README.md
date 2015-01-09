@@ -21,7 +21,7 @@ png2pos is:
 png2pos conforms to ESC/POS language used by these printers:
 
 * Epson TM-T70 (tested)
-* Epson TM-T88IV
+* Epson TM-T88
 * Epson TM-T90
 
 ## Pricing and Support

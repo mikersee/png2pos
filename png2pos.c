@@ -95,9 +95,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    #ifdef DEBUG
+#ifdef DEBUG
     mtrace();
-    #endif
+#endif
 
     unsigned char *img_rgba = NULL;
     unsigned char *img_grey = NULL;
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 
             case 'h':
                 fprintf(stderr,
-                    "png2pos is a utility to convert PNG to ESC/POS binary format for EPSON TM-T70 printer\n"
+                    "png2pos is a utility to convert PNG to ESC/POS binary format for EPSON TM-* printers\n"
                     "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-p] [-o FILE] input files\n"
                     "\n"
                     "  -V          display the version number and exit\n"
@@ -246,9 +246,9 @@ int main(int argc, char *argv[]) {
 
         free(img_rgba), img_rgba = NULL;
 
-        #ifdef DEBUG
+#ifdef DEBUG
         lodepng_encode_file("./debug_g.png", img_grey, img_w, img_h, LCT_GREY, 8);
-        #endif
+#endif
 
         // post-processing
         // convert to B/W bitmap
@@ -261,9 +261,9 @@ int main(int argc, char *argv[]) {
                 img_grey[i] = 255 * histogram[img_grey[i]] / img_grey_size;
             }
 
-            #ifdef DEBUG
+#ifdef DEBUG
             lodepng_encode_file("./debug_g_pp.png", img_grey, img_w, img_h, LCT_GREY, 8);
-            #endif
+#endif
 
             // Atkinson Dithering Algorithm
             const struct {
@@ -334,19 +334,23 @@ int main(int argc, char *argv[]) {
 
         free(img_grey), img_grey = NULL;
 
-        #ifdef DEBUG
+#ifdef DEBUG
         lodepng_encode_file("./debug_bw.png", img_bw, PAPER_WIDTH, img_h, LCT_GREY, 1);
-        #endif
+#endif
 
         // number of lines printed in one F112 command...
         // FIXME: = (65535 - size of F112) / (PAPER_WIDTH >> 3) ?
         unsigned int chunk_height = 768;
         // ...could not be over 1662 according to doc
-        if (chunk_height > 1662) chunk_height = 1662;
+        if (chunk_height > 1662) {
+            chunk_height = 1662;
+        }
 
         for (unsigned int l = 0; l < img_h; l += chunk_height) {
             unsigned int l0 = img_h - l;
-            if (l0 > chunk_height) l0 = chunk_height;
+            if (l0 > chunk_height) {
+                l0 = chunk_height;
+            }
 
             unsigned int params_size = 10 + (PAPER_WIDTH >> 3) * l0;
             unsigned char POS_F112[] = {
@@ -367,7 +371,9 @@ int main(int argc, char *argv[]) {
             }
 
             // print data in buffer
-            const unsigned char POS_F50[] = { 0x1d, 0x28, 0x4c, 0x02, 0x00, 0x30, 0x32 };
+            const unsigned char POS_F50[] = {
+                0x1d, 0x28, 0x4c, 0x02, 0x00, 0x30, 0x32
+            };
             for (size_t i = 0; i != sizeof(POS_F50); ++i) {
                 fputc(POS_F50[i], fout);
             }
@@ -381,7 +387,9 @@ int main(int argc, char *argv[]) {
 
     if (config.cut) {
         // cut the paper
-        const unsigned char POS_CUT[] = { 0x1d, 0x56, 0x41, 0x40 };
+        const unsigned char POS_CUT[] = {
+            0x1d, 0x56, 0x41, 0x40
+        };
         for (size_t i = 0; i != sizeof(POS_CUT); ++i) {
             fputc(POS_CUT[i], fout);
         }
@@ -399,9 +407,9 @@ fail:
        fclose(fout), fout = NULL;
     }
 
-    #ifdef DEBUG
+#ifdef DEBUG
     muntrace();
-    #endif
+#endif
 
     return ret;
 }
