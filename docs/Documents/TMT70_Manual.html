@@ -1,0 +1,615 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>TM-T70 Model Manual</title>
+    <link href="./css/printer-manual.css" rel="stylesheet" type="text/css">
+  </head>
+  <body lang="en-US" dir="ltr">
+    <h1>
+      TM/BA Series Printer Driver for Linux<br>
+      TM-T70 Model Manual
+    </h1>
+    <br>
+    <h2>Contents</h2>
+    <ol type="1">
+      <li><a href="#preface">Preface</a></li>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#initial_setting">Initial settings</a></li>
+      <li><a href="#print_option">Setting values of printing options</a></li>
+      <li><a href="#papersize_info">Paper size information</a></li>
+      <li><a href="#restrictions">Restrictions</a></li>
+    </ol>
+    <br>
+
+<!--Preface-->
+    <hr>
+      <h2><a name="preface">1. Preface</a></h2>
+    <hr>
+    <p>This manual describes printing conditions you can specify when 
+      printing on a TM-T70 with "TM/BA Series Printer Driver for 
+      Linux."
+    </p>
+    <p>Refer to <a href="./TmxDriverManual.en.html" target="_blank">the driver manual</a> for information on "TM/BA Series Printer 
+      Driver for Linux."
+    </p><br>
+
+
+<!--Overview-->
+    <hr>
+      <h2><a name="overview">2. Overview</a></h2>
+    <hr>
+    <p>
+      The TM-T70 uses the "TM BA Thermal" of the TM generic model.
+    </p>
+    <p class="overview-description">
+      -The model name to choose when adding a printer by CUPS WebAdmin:<br>
+      "EPSON TM BA Thermal (rastertotmt) (en,en,zh_CN)"
+    </p>
+    <p class="overview-description">
+      -A corresponding PPD file:<br>
+          tm-ba-thermal-rastertotmt.ppd
+    </p>
+    <p>
+      You can specify the following printing options for the TM-T70.
+    </p><br>
+
+    <table class="all-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="all-options">Option</th><th class="all-options">CUPS Admin display</th><th class="all-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="all-options" >PageSize         </td><td class="all-options" >Media Size</td><td class="all-options" >Paper size</td></tr>
+        <tr><td class="all-options" >TmxSpeed         </td><td class="all-options" >Printing Speed</td><td class="all-options" >Printing speed</td></tr>
+        <tr><td class="all-options" >TmxPaperReduction</td><td class="all-options" >Paper Reduction</td><td class="all-options" >Blank page saving</td></tr>
+        <tr><td class="all-options" >TmxPaperSource   </td><td class="all-options" >Paper Source</td><td class="all-options" >Whether to cut or feed the paper</td></tr>
+        <tr><td class="all-options" >TmxPrinterType  </td><td class="all-options" >Printer Type</td><td class="all-options" >Printer type</td></tr>
+        <tr><td class="all-options" >Resolution      </td><td class="all-options" >Resolution</td><td class="all-options" >Output resolution</td></tr>
+        <tr><td class="all-options" >TmxFeedPitch    </td><td class="all-options" >Pitch of Feed</td><td class="all-options" >Unit length of a paper feed</td></tr>
+        <tr><td class="all-options" >TmxMaxBandWidth </td><td class="all-options" >Maximum Band Width</td><td class="all-options" >Maximum image width</td></tr>
+        <tr><td class="all-options" >TmxBandLines    </td><td class="all-options" >Band Lines</td><td class="all-options" >Band Height for image command</td></tr>
+        <tr><td class="all-options" >TmxSpeedControl </td><td class="all-options" >Speed Control</td><td class="all-options" >Printing speed control</td></tr>
+        <tr><td class="all-options" >TmxBuzzerControl</td><td class="all-options" >Buzzer</td><td class="all-options" >Whether to emit a beep</td></tr>
+        <tr><td class="all-options" >TmxSoundPattern </td><td class="all-options" >Sound Pattern</td><td class="all-options" >Beep pattern</td></tr>
+        <tr><td class="all-options" >TmxBuzzerRepeat </td><td class="all-options" >Buzzer Repeat</td><td class="all-options" >Beep repeat count</td></tr>
+        <tr><td class="all-options" >TmxDrawerControl</td><td class="all-options" >Cash Drawer</td><td class="all-options" >Cash drawer control</td></tr>
+        <tr><td class="all-options" >TmxPulseOnTime  </td><td class="all-options" >Pulse On Time</td><td class="all-options" >Pulse width of Cash drawer kick</td></tr>
+      </tbody>
+    </table>
+    <br>
+    <p>
+      Setting values of printing options can be changed from the GUI or
+      the command line. For descriptions on setting values of each print
+      option, see "4. Setting values of printing options."
+    </p>
+    <p class="example-description">
+      Example) Specify the paper size to Roll paper (80 x 297 mm)
+               using an lp command.<br><br>
+           $ lp -o Pagesize=RP80x297
+    </p>
+    <p class="note-title">
+      Note)
+    </p>
+    <p class="note-description">
+    ! You can also specify the number of copies using a CUPS&rsquo;
+      proprietary option.<br>
+      Refer to the CUPS document for information on CUPS&rsquo; proprietary
+      options.
+    </p>
+    <p class="note-url"><A href="http://localhost:631/help/" target="_blank">http://localhost:631/help/</A></p>
+    <br>
+
+<!--Initial settings-->
+    <hr>
+      <h2><a name="initial_setting">3. Initial settings</a></h2>
+    <hr>
+    <p>
+      Initial settings of the printer options are as follows. <br>
+      The mark (*) shows a different option from the initial value of 
+      a driver. <br>
+      Please be careful on setting the option marked with (*).<br>
+    </p>
+    <table class="init-settings" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="init-settings">CUPS Admin display</th><th class="init-settings">Initial setting</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="init-settings" colspan="2">[General]            </td></tr>
+        <tr><td class="menu-indent" > Media Size          </td><td class="init-settings"> Roll paper 80 x 297 mm</td></tr>
+        <tr><td class="menu-indent"> Printing Speed      </td><td class="init-settings"> Use the printer settings</td></tr>
+        <tr><td class="menu-indent"> Paper Reduction     </td><td class="init-settings"> Bottom margin</td></tr>
+        <tr><td class="menu-indent"> Paper Source        </td><td class="init-settings"> Document [Feed, Cut]</td></tr>
+        <tr><td class="init-settings" colspan="2">[Printer Setting]    </td></tr>
+        <tr><td class="menu-indent"> Printer Type        </td><td class="init-settings"> Thermal receipt</td></tr>
+        <tr><td class="menu-indent different-marker"> Resolution          </td><td class="init-settings different-marker"> 203 x 203 dpi (*)</td></tr>
+        <tr><td class="menu-indent different-marker"> Pitch of Feed       </td><td class="init-settings different-marker"> 203 dpi (*)</td></tr>
+        <tr><td class="menu-indent different-marker"> Maximum Band Width  </td><td class="init-settings different-marker"> 576 (*)</td></tr>
+        <tr><td class="menu-indent"> Band Lines          </td><td class="init-settings"> 256</td></tr>
+        <tr><td class="menu-indent different-marker"> Speed Control       </td><td class="init-settings different-marker"> Max. level 9 (*)</td></tr>
+        <tr><td class="init-settings" colspan="2">[Buzzer Control]     </td></tr>
+        <tr><td class="menu-indent"> Buzzer              </td><td class="init-settings"> Not used</td></tr>
+        <tr><td class="menu-indent different-marker"> Sound Pattern       </td><td class="init-settings different-marker"> Option buzzer (Pattern A) (*)</td></tr>
+        <tr><td class="menu-indent"> Buzzer Repeat       </td><td class="init-settings"> 1</td></tr>
+        <tr><td class="init-settings" colspan="2">[Cash Drawer Control]</td></tr>
+        <tr><td class="menu-indent"> Cash Drawer         </td><td class="init-settings"> Don&rsquo;t open drawers</td></tr>
+        <tr><td class="menu-indent"> Pulse On Time       </td><td class="init-settings"> 20 msec</td></tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+
+<!--Setting values of printing options-->
+    <hr>
+      <h2><a name="print_option">4. Setting values of printing options</a></h2>
+    <hr>
+    <p>
+      The following settings are available in printing options.<br>
+    </p>
+    <h3>[General]</h3>
+<!--Media Size-->
+    <p>
+      <span class="option-title">Media Size:</span> Specify the paper size
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">RP82.5x297</td><td class="printing-options">Roll paper 82.5 x 297 mm</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">RP80x297</td><td class="printing-options">Roll paper 80 x 297 mm</td><td class="printing-options">Roll paper (80 x 297 mm)</td></tr>
+        <tr><td class="printing-options">RP60x297</td><td class="printing-options">Roll paper 60 x 297 mm</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">RP58x297</td><td class="printing-options">Roll paper 58 x 297 mm</td><td class="printing-options">Roll paper (58 x 297 mm)</td></tr>
+        <tr><td class="printing-options">A4</td><td class="printing-options">A4</td><td class="printing-options">A4</td></tr>
+        <tr><td class="printing-options">LT</td><td class="printing-options">LT</td><td class="printing-options">Letter</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Printing Speed-->
+    <p>
+      <span class="option-title">Printing Speed:</span> Specify the printing speed
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">Auto</td><td class="printing-options">Use the printer settings</td><td class="printing-options">Use the default value of the printer</td></tr>
+        <tr><td class="printing-options">1</td><td class="printing-options">1st (Fast)</td><td class="printing-options">Print at the fastest speed</td></tr>
+        <tr><td class="printing-options">2</td><td class="printing-options">2nd</td><td class="printing-options">Print at the second fastest speed</td></tr>
+        <tr><td class="printing-options">3</td><td class="printing-options">3rd</td><td class="printing-options">Print at the third fastest speed</td></tr>
+        <tr><td class="printing-options">4</td><td class="printing-options">4th (Slow)</td><td class="printing-options">Print at the slowest speed</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Paper Reduction-->
+    <p>
+      <span class="option-title">Paper Reduction:</span> Specify whether to save blank pages
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">Off</td><td class="printing-options">None</td><td class="printing-options">Do not save blank pages</td></tr>
+        <tr><td class="printing-options">Top</td><td class="printing-options">Top margin</td><td class="printing-options">Save blank at the top</td></tr>
+        <tr><td class="printing-options">Bottom</td><td class="printing-options">Bottom margin</td><td class="printing-options">Save blank at the bottom</td></tr>
+        <tr><td class="printing-options">Both</td><td class="printing-options">Top &amp; Bottom margins</td><td class="printing-options">Save blank at the top and bottom</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Paper Source-->
+    <p>
+      <span class="option-title">Paper Source:</span> Specify whether to cut or feed the paper
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">DocFeedCut</td><td class="printing-options">Document [Feed, Cut]</td><td class="printing-options">Partially cut after feeding</td></tr>
+        <tr><td class="printing-options">DocFeedNoCut</td><td class="printing-options">Document [Feed, NoCut]</td><td class="printing-options">Feed to the manual cut position without cutting</td></tr>
+        <tr><td class="printing-options">DocNoFeedCut</td><td class="printing-options">Document [NoFeed, Cut]</td><td class="printing-options">Partially cut immediately without feeding</td></tr>
+        <tr><td class="printing-options">DocNoFeedNoCut</td><td class="printing-options">Document [NoFeed, NoCut]</td><td class="printing-options">Do nothing</td></tr>
+        <tr><td class="printing-options">PageFeedCut</td><td class="printing-options">Page [Feed, Cut]</td><td class="printing-options">Partially cut every page after feeding</td></tr>
+        <tr><td class="printing-options">PageFeedNoCut</td><td class="printing-options">Page [Feed, NoCut]</td><td class="printing-options">Feed every page to the manual cut position without cutting</td></tr>
+        <tr><td class="printing-options">PageNoFeedCut</td><td class="printing-options">Page [NoFeed, Cut]</td><td class="printing-options">Partially cut every page immediately without feeding</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+    <h3>[Printer Setting]</h3>
+<!--Printer Type-->
+    <p>
+      <span class="option-title">Printer Type:</span> Specify the printer type
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">ThermalReceipt</td><td class="printing-options">Thermal receipt</td><td class="printing-options">Thermal receipt type</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Resolution-->
+    <p>
+      <span class="option-title">Resolution:</span> Specify the output resolution
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">180x180dpi</td><td class="printing-options">180 x 180 dpi</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">203x203dpi</td><td class="printing-options">203 x 203 dpi</td><td class="printing-options">Output at 203 x 203 dpi</td></tr>
+        <tr><td class="printing-options">162x162dpi</td><td class="printing-options">[90%/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">144x144dpi</td><td class="printing-options">[80%/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">126x126dpi</td><td class="printing-options">[70%/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">108x108dpi</td><td class="printing-options">[60%/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">90x90dpi</td><td class="printing-options">[50%/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">72x72dpi</td><td class="printing-options">[40%/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">61x61dpi</td><td class="printing-options">[33%(A4 to 80mm)/180dpi]</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">0182x182dpi</td><td class="printing-options">[90%/203dpi]</td><td class="printing-options">90% reduced (203dpi)</td></tr>
+        <tr><td class="printing-options">0162x162dpi</td><td class="printing-options">[80%/203dpi]</td><td class="printing-options">80% reduced (203dpi)</td></tr>
+        <tr><td class="printing-options">0142x142dpi</td><td class="printing-options">[70%/203dpi]</td><td class="printing-options">70% reduced (203dpi)</td></tr>
+        <tr><td class="printing-options">0121x121dpi</td><td class="printing-options">[60%/203dpi]</td><td class="printing-options">60% reduced (203dpi)</td></tr>
+        <tr><td class="printing-options">0102x102dpi</td><td class="printing-options">[50%/203dpi]</td><td class="printing-options">50% reduced (203dpi)</td></tr>
+        <tr><td class="printing-options">081x81dpi</td><td class="printing-options">[40%/203dpi]</td><td class="printing-options">40% reduced (203dpi)</td></tr>
+        <tr><td class="printing-options">068x68dpi</td><td class="printing-options">[33%(A4 to 80mm)/203dpi]</td><td class="printing-options">33% reduced(A4 to 80mm) (203dpi)</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Pitch of Feed-->
+    <p>
+      <span class="option-title">Pitch of Feed:</span> Specify the unit length of a paper feed
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">180.0</td><td class="printing-options">180 dpi</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">203.2</td><td class="printing-options">203 dpi</td><td class="printing-options">Paper feed at 203 dpi</td></tr>
+        <tr><td class="printing-options">360.0</td><td class="printing-options">360 dpi</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">406.4</td><td class="printing-options">406 dpi</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Maximum Band Width-->
+    <p>
+      <span class="option-title">Maximum Band Width:</span> Specify the maximum image width
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">360</td><td class="printing-options">360</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">384</td><td class="printing-options">384</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">416</td><td class="printing-options">416</td><td class="printing-options">416 dots</td></tr>
+        <tr><td class="printing-options">420</td><td class="printing-options">420</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">436</td><td class="printing-options">436</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">512</td><td class="printing-options">512</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">576</td><td class="printing-options">576</td><td class="printing-options">576 dots</td></tr>
+        <tr><td class="printing-options">640</td><td class="printing-options">640</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Band Lines-->
+    <p>
+      <span class="option-title">Band Lines:</span> Specify the band height for image command
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">256</td><td class="printing-options">256</td><td class="printing-options">Output band by 256 lines</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Speed Control-->
+    <p>
+      <span class="option-title">Speed Control:</span> Specify the way of control to printing speed
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">0,0,0,0</td><td class="printing-options">None</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">-1,-1,-1,-1</td><td class="printing-options">BA-T series</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">9,7,4,1</td><td class="printing-options">Max. level 9</td><td class="printing-options">Maximum speed is level 9</td></tr>
+        <tr><td class="printing-options">11,8,4,1</td><td class="printing-options">Max. level 11</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">13,9,5,1</td><td class="printing-options">Max. level 13</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+    <h3>[Buzzer Control]</h3>
+<!--Buzzer-->
+    <p>
+      <span class="option-title">Buzzer:</span> Specify whether to emit a beep
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">Off</td><td class="printing-options">Not used</td><td class="printing-options">Do not emit a beep</td></tr>
+        <tr><td class="printing-options">Before</td><td class="printing-options">Sounds before printing</td><td class="printing-options">Emit a beep before printing</td></tr>
+        <tr><td class="printing-options">After</td><td class="printing-options">Sounds after printing </td><td class="printing-options">Emit a beep after printing</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Sound Pattern-->
+    <p>
+      <span class="option-title">Sound Pattern:</span> Specify the beep pattern
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">Internal</td><td class="printing-options">Internal buzzer</td><td class="printing-options">&lt;Unselectable&gt;</td></tr>
+        <tr><td class="printing-options">A</td><td class="printing-options">Option buzzer (Pattern A)</td><td class="printing-options">Beep pattern A</td></tr>
+        <tr><td class="printing-options">B</td><td class="printing-options">Option buzzer (Pattern B)</td><td class="printing-options">Beep pattern B</td></tr>
+        <tr><td class="printing-options">C</td><td class="printing-options">Option buzzer (Pattern C)</td><td class="printing-options">Beep pattern C</td></tr>
+        <tr><td class="printing-options">D</td><td class="printing-options">Option buzzer (Pattern D)</td><td class="printing-options">Beep pattern D</td></tr>
+        <tr><td class="printing-options">E</td><td class="printing-options">Option buzzer (Pattern E)</td><td class="printing-options">Beep pattern E</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Buzzer Repeat-->
+    <p>
+      <span class="option-title">Buzzer Repeat:</span> Specify the number of beeps
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">1</td><td class="printing-options">1</td><td class="printing-options">Beep once</td></tr>
+        <tr><td class="printing-options">2</td><td class="printing-options">2</td><td class="printing-options">Beep twice</td></tr>
+        <tr><td class="printing-options">3</td><td class="printing-options">3</td><td class="printing-options">Beep three times</td></tr>
+        <tr><td class="printing-options">5</td><td class="printing-options">5</td><td class="printing-options">Beep five times</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+    <h3>[Cash Drawer Control]</h3>
+<!--Cash Drawer-->
+    <p>
+      <span class="option-title">Cash Drawer:</span> Specify the operation of cash drawer
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">None</td><td class="printing-options">Don&rsquo;t open drawers</td><td class="printing-options">Do not open the drawer</td></tr>
+        <tr><td class="printing-options">Drawer#1,Before</td><td class="printing-options">Open drawer #1 BEFORE printing</td><td class="printing-options">Open drawer #1 before printing</td></tr>
+        <tr><td class="printing-options">Drawer#1,After</td><td class="printing-options">Open drawer #1 AFTER printing</td><td class="printing-options">Open drawer #1 after printing</td></tr>
+        <tr><td class="printing-options">Drawer#2,Before</td><td class="printing-options">Open drawer #2 BEFORE printing</td><td class="printing-options">Open drawer #2 before printing</td></tr>
+        <tr><td class="printing-options">Drawer#2,After</td><td class="printing-options">Open drawer #2 AFTER printing</td><td class="printing-options">Open drawer #2 after printing</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Pulse On Time-->
+    <p>
+      <span class="option-title">Pulse On Time:</span> Specify the pulse width of drawer kick
+    </p>
+    <table class="printing-options" cellpadding="0" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="printing-options">Setting value</th><th class="printing-options">CUPS Admin display</th><th class="printing-options">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="printing-options">20,10,100</td><td class="printing-options">20 msec</td><td class="printing-options">On:20 msec, Off:200 msec</td></tr>
+        <tr><td class="printing-options">40,20,100</td><td class="printing-options">40 msec</td><td class="printing-options">On:40 msec, Off:200 msec</td></tr>
+        <tr><td class="printing-options">60,30,120</td><td class="printing-options">60 msec</td><td class="printing-options">On:60 msec, Off:240 msec</td></tr>
+        <tr><td class="printing-options">80,40,160</td><td class="printing-options">80 msec</td><td class="printing-options">On:80 msec, Off:320 msec</td></tr>
+        <tr><td class="printing-options">100,50,200</td><td class="printing-options">100 msec</td><td class="printing-options">On:100 msec, Off:400 msec</td></tr>
+        <tr><td class="printing-options">120,60,240</td><td class="printing-options">120 msec</td><td class="printing-options">On:120 msec, Off:480 msec</td></tr>
+      </tbody>
+    </table>
+    <br>
+
+<!--Paper size information-->
+    <hr>
+      <h2><a name="papersize_info">5. Paper size information</a></h2>
+    <hr>
+    <br>
+
+    <table class="psize-info" width="950">
+      <thead>
+        <tr>
+          <th class="psize-info psize-info-1st-row" width="230">Paper size name</th>
+          <th class="psize-info psize-info-1st-row" colspan="2" width="120">Input size</th>
+          <th class="psize-info psize-info-1st-row" colspan="4" width="180">Input size</th>
+          <th class="psize-info psize-info-1st-row" colspan="2" width="120">Output paper size</th>
+        </tr>
+        <tr>
+          <th class="psize-info psize-info-2nd-row" width="230">(CUPS Admin display)</th>
+          <th class="psize-info psize-info-2nd-row psize-info-left-col" width="60">Width</th>
+          <th class="psize-info psize-info-2nd-row psize-info-right-col" width="60">Length</th>
+          <th class="psize-info psize-info-2nd-row psize-info-left-col" width="40">Left</th>
+          <th class="psize-info psize-info-2nd-row psize-info-mid-col" width="50">Right</th>
+          <th class="psize-info psize-info-2nd-row psize-info-mid-col" width="40">Top</th>
+          <th class="psize-info psize-info-2nd-row psize-info-right-col" width="50">Bottom</th>
+          <th class="psize-info psize-info-2nd-row psize-info-left-col" width="60">Width</th>
+          <th class="psize-info psize-info-2nd-row psize-info-right-col" width="60">Length</th>
+        </tr>
+        <tr>
+          <th class="psize-info psize-info-3rd-row" width="230">&nbsp;</th>
+          <th class="psize-info psize-info-mm psize-info-3rd-row" colspan="2" width="120">(mm)</th>
+          <th class="psize-info psize-info-mm psize-info-3rd-row" colspan="4" width="180">(mm)</th>
+          <th class="psize-info psize-info-mm psize-info-3rd-row" colspan="2" width="120">(mm)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="psize-info" width="230">
+            <ul class="psize-list-papername">
+              <li>Roll paper 80 x 297 mm</li>
+              <li>Roll paper 58 x 297 mm</li>
+              <li>A4</li>
+              <li>LT</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-left-col" width="60">
+            <ul class="psize-info-list">
+              <li>72.0</li>
+              <li>50.8</li>
+              <li>202.0</li>
+              <li>207.9</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-right-col" width="60">
+            <ul class="psize-info-list">
+              <li>297.0</li>
+              <li>297.0</li>
+              <li>289.0</li>
+              <li>271.4</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-left-col" width="40">
+            <ul class="psize-info-list">
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-mid-col" width="50">
+            <ul class="psize-info-list">
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-mid-col" width="40">
+            <ul class="psize-info-list">
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-right-col" width="50">
+            <ul class="psize-info-list">
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+              <li>0.0</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-left-col" width="60">
+            <ul class="psize-info-list">
+              <li>72.0</li>
+              <li>50.8</li>
+              <li>202.0</li>
+              <li>207.9</li>
+            </ul>
+          </td>
+          <td class="psize-info psize-info-right-col" width="60">
+            <ul class="psize-info-list">
+              <li>297.0</li>
+              <li>297.0</li>
+              <li>289.0</li>
+              <li>271.4</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      This driver allows you to specify the paper size using CUPS&rsquo; 
+      options.
+    </p>
+    <p class="example-description">
+      Example) Print a file to 80 x 297 mm in size.<br><br>
+           $ lp -o media=Custom.72x297mm file
+    </p>
+    <p class="pinfo-description">
+      The paper size can be specified within the following range.
+    </p>
+    <table>
+      <tr><td>Paper width:</td><td>25.4 - 72 mm</td></tr>
+      <tr><td>Paper length:</td><td>25.4 - 2,000 mm</td></tr>
+    </table>
+    <br>
+    <br>
+
+<!--Restrictionsn-->
+    <hr>
+      <h2><a name="restrictions">6. Restrictions</a></h2>
+    <hr>
+    <p>
+      * You cannot specify printing conditions for each page.
+    </p>
+    <br>
+
+    <hr>
+<!--Copyright-->
+    <p>
+      Copyright (C) Seiko Epson Corporation 2013-2014. All rights reserved.<br>
+      <br>
+      Linux is the registered trademark or trademark of Linus Torvalds in 
+      the U.S.A. and other countries.<br>
+      <br>
+      CUPS and the CUPS logo are trademarks of Apple Inc. registered in the 
+      U.S.A. and other countries.<br>
+      <br>
+      Other product names in this document are trademarks or registered 
+      trademarks of respective companies.<br>
+    </p>
+
+  </body>
+</html>
