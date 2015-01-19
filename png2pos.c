@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <unistd.h>
 #include <getopt.h>
 #include "lodepng.h"
@@ -30,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <mcheck.h>
 #endif
 
-const char *PNG2POS_VERSION = "1.5.4";
+const char *PNG2POS_VERSION = "1.6.0";
 const char *PNG2POS_BUILTON = __DATE__;
 
 // modified lodepng allocators
@@ -46,9 +45,68 @@ void lodepng_free(void *ptr) {
     free(ptr);
 }
 
-// printer page width must be divisible by 8!!
-const unsigned int PAPER_WIDTH = 512u;
+// ESC sequences
+#define ESC_INIT_LENGTH 2
+const unsigned char ESC_INIT[ESC_INIT_LENGTH] = {
+    // ESC @, Initialize printer, p. 412
+    0x1b, 0x40
+};
 
+#define ESC_CUT_LENGTH 4
+const unsigned char ESC_CUT[ESC_CUT_LENGTH] = {
+    // GS V, Sub-Function B, p. 373
+    0x1d, 0x56, 0x41,
+    // Feeds paper to (cutting position + n × vertical motion unit) and executes a full cut (cuts the paper completely)
+    // The vertical motion unit is specified by GS P.
+    // The distance from print head to autocutter is about 13 mm. After executing a paper cut, a paper feed for 1 mm 
+    // before starting the next printing can provide the best printing result without uneven paper feeding.
+    0x40
+};
+
+/*
+#define ESC_SETLEFT_LENGTH 4
+unsigned char ESC_SETLEFT[ESC_SETLEFT_LENGTH] = {
+    // GS L, Set left margin, p. 169
+    0x1d, 0x4c, 
+    // nl, nh, 0 ≤ (nL + nH × 256) ≤ 65535 (0 ≤ nL ≤ 255, 0 ≤ nH ≤ 255)
+    0x00, 0x00
+};
+*/
+
+#define ESC_STORE_LENGTH 17
+unsigned char ESC_STORE[ESC_STORE_LENGTH] = {
+    // GS 8 L, Store the graphics data in the print buffer (raster format), p. 252
+    0x1d, 0x38, 0x4c,
+    // p1 p2 p3 p4
+    0x0b, 0x00, 0x00, 0x00, 
+    // Function 112
+    0x30, 0x70, 0x30,
+    // bx by, zoom
+    0x01, 0x01, 
+    // c, single-printing model
+    0x31, 
+    // xl, xh, number of dots in the horizontal direction, 1≤ (yL + yH × 256) ≤ 1200 (0 ≤ yL ≤ 255, 0 ≤ yH ≤ 4)
+    0x00, 0x00, 
+    // yl, yh, number of dots in the vertical direction, 1 ≤ (yL + yH × 256) ≤ 1476 (0 ≤ yL ≤ 255, 0 ≤ yH ≤ 5)
+    0x00, 0x00 
+};
+
+#define ESC_FLUSH_LENGTH 7
+const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
+     // GS ( L, Print the graphics data in the print buffer, p. 241
+    // Moves print position to the left side of the print area after printing of graphics data is completed
+    0x1d, 0x28, 0x4c, 0x02, 0x00, 0x30,
+    // fn 50
+    0x32 
+};
+
+// number of dots/lines in vertical direction sent in one F112 command
+#define LINES_IN_BATCH 256u
+
+// maximal image width printer is able to process
+#define MAX_CANVAS_WIDTH 512u
+
+// app configuration
 struct {
     unsigned int cut;
     unsigned int photo;
@@ -58,7 +116,7 @@ struct {
 } config = {
     .cut = 0,
     .photo = 0,
-    .align = 'L',
+    .align = '?',
     .rotate = 0,
     .output = NULL
 };
@@ -86,15 +144,13 @@ char* basename(const char *s) {
     return r;
 }
 
-int main(int argc, char *argv[]) {
-    {
-        // printer page width must be divisible by 8!!
-        if (PAPER_WIDTH % 8 != 0) {
-            fprintf(stderr, "FATAL ERROR: PRINTER PAGE WIDTH MUST BE DIVISIBLE BY 8, PLEASE RECOMPILE\n");
-            return EXIT_FAILURE;
-        }
+void print(FILE *stream, const unsigned char *buffer, const int length) {
+    for (size_t i = 0; i != length; ++i) {
+        fputc(buffer[i], stream);
     }
+}
 
+int main(int argc, char *argv[]) {
 #ifdef DEBUG
     mtrace();
 #endif
@@ -143,7 +199,7 @@ int main(int argc, char *argv[]) {
 
             case 'h':
                 fprintf(stderr,
-                    "png2pos is a utility to convert PNG to ESC/POS binary format for EPSON TM-* printers\n"
+                    "png2pos is a utility to convert PNG to ESC/POS binary format for thermal printers\n"
                     "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-p] [-o FILE] input files\n"
                     "\n"
                     "  -V          display the version number and exit\n"
@@ -195,18 +251,15 @@ int main(int argc, char *argv[]) {
         goto fail;
     }
 
-    setvbuf(fout, NULL, _IOFBF, 4096);
+    setvbuf(fout, NULL, _IOFBF, 8192);
 
     // init printer
-    const unsigned char POS_INIT[] = { 0x1b, 0x40 };
-    for (size_t i = 0; i != sizeof(POS_INIT); ++i) {
-        fputc(POS_INIT[i], fout);
-    }
+    print(fout, ESC_INIT, ESC_INIT_LENGTH);
     fflush(fout);
 
     // for each input files
     while (optind != argc) {
-        const char *input = argv[optind];
+        const char *input = argv[optind++];
 
         // load RGBA PNG
         unsigned int img_w = 0;
@@ -217,8 +270,8 @@ int main(int argc, char *argv[]) {
             goto fail;
         }
 
-        if (img_w > PAPER_WIDTH) {
-            fprintf(stderr, "Image width %u px exceeds the printer's capability (%u px)\n", img_w, PAPER_WIDTH);
+        if (img_w > MAX_CANVAS_WIDTH) {
+            fprintf(stderr, "Image width %u px exceeds the printer's capability (%u px)\n", img_w, MAX_CANVAS_WIDTH);
             goto fail;
         }
 
@@ -232,7 +285,7 @@ int main(int argc, char *argv[]) {
             goto fail;
         }
 
-        // imgr_rgba = [R G B A R G B A R G B A R G B A ...]
+        // imgr_rgba = [R G B A  R G B A  R G B A  R G B A ...]
         for (unsigned int i = 0; i != img_grey_size; ++i) {
             const unsigned char *r = &img_rgba[i << 2];
             const unsigned char *g = &img_rgba[(i << 2) | 1];
@@ -293,11 +346,19 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        const unsigned int img_bw_size = img_h * (PAPER_WIDTH >> 3);
+        // canvas size is width of a picture rounded up to nearest multiple of 8
+        const unsigned int canvas_w = ((img_w + 7) >> 3) << 3;
+
+        const unsigned int img_bw_size = img_h * (canvas_w >> 3);
         img_bw = (unsigned char *)calloc(img_bw_size, sizeof(unsigned char));
         if (!img_bw) {
             fprintf(stderr, "Could not allocate enough memory\n");
             goto fail;
+        }
+
+        // align rotated image to the right border
+        if (config.rotate == 1 && config.align == '?') {
+            config.align = 'R';
         }
 
         // left offset
@@ -305,94 +366,64 @@ int main(int argc, char *argv[]) {
         switch (config.align) {
             case 'c':
             case 'C':
-                offset = (PAPER_WIDTH - img_w) >> 1;
+                offset = (canvas_w - img_w) >> 1;
                 break;
 
             case 'r':
             case 'R':
-                offset = PAPER_WIDTH - img_w;
+                offset = canvas_w - img_w;
                 break;
 
             case 'l':
             case 'L':
+            case '?':
             default:
                 offset = 0;
         }
 
-        // set whole B/W image to white
-        memset(img_bw, 0xff, img_bw_size);
         // compress
         for (unsigned int i = 0; i != img_grey_size; ++i) {
             const unsigned int idx = config.rotate ? (img_grey_size - 1) - i: i;
             if ((img_grey[idx] & 0x80) == 0) {
                 unsigned int x = i % img_w + offset;
                 unsigned int y = i / img_w;
-                unsigned int j = (y * PAPER_WIDTH + x) >> 3;
-                img_bw[j] &= ~(1 << (7 - (x & 0x07)));
+                unsigned int j = (y * canvas_w + x) >> 3;
+                img_bw[j] |= 0x80 >> (x & 0x07);
             }
         }
 
         free(img_grey), img_grey = NULL;
 
 #ifdef DEBUG
-        lodepng_encode_file("./debug_bw.png", img_bw, PAPER_WIDTH, img_h, LCT_GREY, 1);
+        lodepng_encode_file("./debug_bw.png", img_bw, canvas_w, img_h, LCT_GREY, 1);
 #endif
 
-        // number of lines printed in one F112 command...
-        // FIXME: = (65535 - size of F112) / (PAPER_WIDTH >> 3) ?
-        unsigned int chunk_height = 768;
-        // ...could not be over 1662 according to doc
-        if (chunk_height > 1662) {
-            chunk_height = 1662;
-        }
-
-        for (unsigned int l = 0; l < img_h; l += chunk_height) {
-            unsigned int l0 = img_h - l;
-            if (l0 > chunk_height) {
-                l0 = chunk_height;
+        // chunking bitmap, l = lines already printed, k = currently printing chunk of height k
+        for (unsigned int l = 0, k = LINES_IN_BATCH; l < img_h; l += k) {
+            if (k > img_h - l) {
+                k = img_h - l;
             }
 
-            unsigned int params_size = 10 + (PAPER_WIDTH >> 3) * l0;
-            unsigned char POS_F112[] = {
-                0x1d, 0x28, 0x4c,
-                params_size & 0xff, params_size >> 8 & 0xff,
-                0x30, 0x70, 0x30, 0x01, 0x01, 0x31,
-                PAPER_WIDTH & 0xff, PAPER_WIDTH >> 8 & 0xff,
-                l0 & 0xff, l0 >> 8 & 0xff
-            };
-            for (size_t i = 0; i != sizeof(POS_F112); ++i) {
-                fputc(POS_F112[i], fout);
-            }
+            unsigned int f112_p = 10 + (canvas_w >> 3) * k;
+            ESC_STORE[ 3] = f112_p & 0xff;
+            ESC_STORE[ 4] = f112_p >> 8 & 0xff;
+            ESC_STORE[13] = canvas_w & 0xff;
+            ESC_STORE[14] = canvas_w >> 8 & 0xff;
+            ESC_STORE[15] = k & 0xff;
+            ESC_STORE[16] = k >> 8 & 0xff;
 
-            // please note unary bitwise complement (NOT) (black 0 must be 1 = burned pixel on the paper)
-            unsigned int octets = l0 * (PAPER_WIDTH >> 3);
-            for (unsigned int i = 0; i != octets; ++i) {
-                fputc(~img_bw[l * (PAPER_WIDTH >> 3) + i], fout);
-            }
-
-            // print data in buffer
-            const unsigned char POS_F50[] = {
-                0x1d, 0x28, 0x4c, 0x02, 0x00, 0x30, 0x32
-            };
-            for (size_t i = 0; i != sizeof(POS_F50); ++i) {
-                fputc(POS_F50[i], fout);
-            }
+            print(fout, ESC_STORE, ESC_STORE_LENGTH);
+            print(fout, &img_bw[l * (canvas_w >> 3)], k * (canvas_w >> 3));
+            print(fout, ESC_FLUSH, ESC_FLUSH_LENGTH);
             fflush(fout);
         }
 
         free(img_bw), img_bw = NULL;
-
-        ++optind;
    }
 
     if (config.cut) {
         // cut the paper
-        const unsigned char POS_CUT[] = {
-            0x1d, 0x56, 0x41, 0x40
-        };
-        for (size_t i = 0; i != sizeof(POS_CUT); ++i) {
-            fputc(POS_CUT[i], fout);
-        }
+        print(fout, ESC_CUT, ESC_CUT_LENGTH);
         fflush(fout);
     }
 

@@ -21,8 +21,13 @@ png2pos is:
 png2pos conforms to ESC/POS language used by these printers:
 
 * Epson TM-T70 (tested)
-* Epson TM-T88
+* Epson TM-T88IV
 * Epson TM-T90
+* Epson TM-L90
+* Epson TM-P60
+* Epson TM-J2000/J2100 (deprecated, works if LINES_IN_BATCH = 128)
+* PRT PT562A-B (pending)
+* PRT PT802A-B (pending)
 
 ## Pricing and Support
 
