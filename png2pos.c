@@ -58,49 +58,45 @@ const unsigned char ESC_CUT[ESC_CUT_LENGTH] = {
     0x1d, 0x56, 0x41,
     // Feeds paper to (cutting position + n × vertical motion unit) and executes a full cut (cuts the paper completely)
     // The vertical motion unit is specified by GS P.
-    // The distance from print head to autocutter is about 13 mm. After executing a paper cut, a paper feed for 1 mm 
-    // before starting the next printing can provide the best printing result without uneven paper feeding.
     0x40
 };
 
-/*
 #define ESC_SETLEFT_LENGTH 4
 unsigned char ESC_SETLEFT[ESC_SETLEFT_LENGTH] = {
     // GS L, Set left margin, p. 169
     0x1d, 0x4c, 
-    // nl, nh, 0 ≤ (nL + nH × 256) ≤ 65535 (0 ≤ nL ≤ 255, 0 ≤ nH ≤ 255)
-    0x00, 0x00
+    // nl, nh
+       0,    0
 };
-*/
 
 #define ESC_STORE_LENGTH 17
 unsigned char ESC_STORE[ESC_STORE_LENGTH] = {
     // GS 8 L, Store the graphics data in the print buffer (raster format), p. 252
     0x1d, 0x38, 0x4c,
     // p1 p2 p3 p4
-    0x0b, 0x00, 0x00, 0x00, 
+    0x0b,    0,    0,    0, 
     // Function 112
     0x30, 0x70, 0x30,
     // bx by, zoom
     0x01, 0x01, 
-    // c, single-printing model
+    // c, single-color printing model
     0x31, 
-    // xl, xh, number of dots in the horizontal direction, 1≤ (yL + yH × 256) ≤ 1200 (0 ≤ yL ≤ 255, 0 ≤ yH ≤ 4)
-    0x00, 0x00, 
-    // yl, yh, number of dots in the vertical direction, 1 ≤ (yL + yH × 256) ≤ 1476 (0 ≤ yL ≤ 255, 0 ≤ yH ≤ 5)
-    0x00, 0x00 
+    // xl, xh, number of dots in the horizontal direction
+       0,    0, 
+    // yl, yh, number of dots in the vertical direction
+       0,    0 
 };
 
 #define ESC_FLUSH_LENGTH 7
 const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
      // GS ( L, Print the graphics data in the print buffer, p. 241
     // Moves print position to the left side of the print area after printing of graphics data is completed
-    0x1d, 0x28, 0x4c, 0x02, 0x00, 0x30,
-    // fn 50
+    0x1d, 0x28, 0x4c, 0x02,    0, 0x30,
+    // Fn 50
     0x32 
 };
 
-// number of dots/lines in vertical direction sent in one F112 command
+// number of dots/lines in vertical direction in one F112 command
 #define LINES_IN_BATCH 256u
 
 // maximal image width printer is able to process
@@ -145,7 +141,7 @@ char* basename(const char *s) {
 }
 
 void print(FILE *stream, const unsigned char *buffer, const int length) {
-    for (size_t i = 0; i != length; ++i) {
+    for (unsigned int i = 0; i != length; ++i) {
         fputc(buffer[i], stream);
     }
 }
@@ -207,7 +203,7 @@ int main(int argc, char *argv[]) {
                     "  -c          cut the paper at the end of job\n"
                     "  -a L|C|R    horizontal image alignment (Left, Center, Right)\n"
                     "  -r          rotate image upside down before it is printed\n"
-                    "  -p          pre-process the images\n"
+                    "  -p          consider input as images and pre-process them\n"
                     "  -o FILE     output file\n"
                     "\n"
                     "With no FILE, or when FILE is -, write to standard output\n"
@@ -347,7 +343,7 @@ int main(int argc, char *argv[]) {
         }
 
         // canvas size is width of a picture rounded up to nearest multiple of 8
-        const unsigned int canvas_w = ((img_w + 7) >> 3) << 3;
+        const unsigned int canvas_w = (img_w + 7) & ! 0x7;
 
         const unsigned int img_bw_size = img_h * (canvas_w >> 3);
         img_bw = (unsigned char *)calloc(img_bw_size, sizeof(unsigned char));
@@ -395,16 +391,16 @@ int main(int argc, char *argv[]) {
         free(img_grey), img_grey = NULL;
 
 #ifdef DEBUG
-        lodepng_encode_file("./debug_bw.png", img_bw, canvas_w, img_h, LCT_GREY, 1);
+        lodepng_encode_file("./debug_bw_inv.png", img_bw, canvas_w, img_h, LCT_GREY, 1);
 #endif
 
-        // chunking bitmap, l = lines already printed, k = currently printing chunk of height k
+        // chunking, l = lines already printed, currently processing a chunk of height k
         for (unsigned int l = 0, k = LINES_IN_BATCH; l < img_h; l += k) {
             if (k > img_h - l) {
                 k = img_h - l;
             }
 
-            unsigned int f112_p = 10 + (canvas_w >> 3) * k;
+            unsigned int f112_p = 10 + k * (canvas_w >> 3);
             ESC_STORE[ 3] = f112_p & 0xff;
             ESC_STORE[ 4] = f112_p >> 8 & 0xff;
             ESC_STORE[13] = canvas_w & 0xff;
@@ -421,7 +417,7 @@ int main(int argc, char *argv[]) {
         free(img_bw), img_bw = NULL;
    }
 
-    if (config.cut) {
+    if (config.cut == 1) {
         // cut the paper
         print(fout, ESC_CUT, ESC_CUT_LENGTH);
         fflush(fout);
