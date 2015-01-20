@@ -32,8 +32,8 @@ png2pos conforms to ESC/POS language used by these printers:
 ## How does it work?
 
 It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap wrapped by ESC/POS commands.
-png2pos prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
-png2pos utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands.
+
+ESC/POS is a printer language. The “POS” stands for “Point of Sale”, the “ESC” stands for “escape” because command instructions are escaped with a special characters. png2pos utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands. It also prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
 
 png2pos requires 5 × WIDTH (rounded up to multiple of 8) × HEIGHT bytes of RAM. (e.g. to process full-width image of receipt 768 pixels tall you need about 2 MiB of RAM.)
 
@@ -125,11 +125,21 @@ With no FILE, or when FILE is -, write to standard output.
 
 ## Usage examples
 
-    $ png2pos -c -r -a R /tmp/*.png > /dev/usb/lp0 ↵
+    $ png2pos -c -r /tmp/*.png > /dev/usb/lp0 ↵
 
-### Examples
+## Extras
 
-#### Lena
+There are some tiny command line utilities available in the extras folder.
+Those are extremely tiny and safe as all is created in assembly language.
+You can customize used ESC/POS commands for your printer model.
+
+    $ cd extras ↵
+    $ make ↵
+    $ ./tmt70cut > /dev/lp0 ↵
+
+## Examples
+
+### Lena
 Original
 
 ![original](docs/lena_png2pos_0_original.png)

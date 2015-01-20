@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <getopt.h>
 #include "lodepng.h"
@@ -56,13 +57,14 @@ const unsigned char ESC_INIT[ESC_INIT_LENGTH] = {
 const unsigned char ESC_CUT[ESC_CUT_LENGTH] = {
     // GS V, Sub-Function B, p. 373
     0x1d, 0x56, 0x41,
-    // Feeds paper to (cutting position + n × vertical motion unit) and executes a full cut (cuts the paper completely)
+    // Feeds paper to (cutting position + n × vertical motion unit)
+    // and executes a full cut (cuts the paper completely)
     // The vertical motion unit is specified by GS P.
     0x40
 };
 
-#define ESC_SETLEFT_LENGTH 4
-unsigned char ESC_SETLEFT[ESC_SETLEFT_LENGTH] = {
+#define ESC_OFFSET_LENGTH 4
+unsigned char ESC_OFFSET[ESC_OFFSET_LENGTH] = {
     // GS L, Set left margin, p. 169
     0x1d, 0x4c, 
     // nl, nh
@@ -89,8 +91,9 @@ unsigned char ESC_STORE[ESC_STORE_LENGTH] = {
 
 #define ESC_FLUSH_LENGTH 7
 const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
-     // GS ( L, Print the graphics data in the print buffer, p. 241
-    // Moves print position to the left side of the print area after printing of graphics data is completed
+    // GS ( L, Print the graphics data in the print buffer, p. 241
+    // Moves print position to the left side of the print area after 
+    // printing of graphics data is completed
     0x1d, 0x28, 0x4c, 0x02,    0, 0x30,
     // Fn 50
     0x32 
@@ -98,10 +101,10 @@ const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
 
 // number of dots/lines in vertical direction in one F112 command
 // set to <= 128u for Epson TM-J2000/J2100
-#define LINES_IN_BATCH 256u
+#define GS8L_MAX_Y 256u
 
-// maximal image width printer is able to process
-#define MAX_CANVAS_WIDTH 512u
+// max image width printer is able to process
+#define PRINTER_MAX_WIDTH 512u
 
 // app configuration
 struct {
@@ -173,8 +176,8 @@ int main(int argc, char *argv[]) {
                 break;
 
             case 'a':
-                config.align = optarg[0];
-                if (!strchr("lLcCrR", config.align)) {
+                config.align = toupper(optarg[0]);
+                if (!strchr("LCR", config.align)) {
                     fprintf(stderr, "Unknown horizontal alignment '%c'\n", config.align);
                     goto fail;
                 }
@@ -235,7 +238,7 @@ int main(int argc, char *argv[]) {
     argv += optind;
     optind = 0;
 
-    // open output file and disable buffering
+    // open output file and disable line buffering
     if (!config.output || strcmp(config.output, "-") == 0) {
         fout = stdout;
     } else if (!(fout = fopen(config.output, "wb"))) {
@@ -248,7 +251,9 @@ int main(int argc, char *argv[]) {
         goto fail;
     }
 
-    setvbuf(fout, NULL, _IOFBF, 8192);
+    if (setvbuf(fout, NULL, _IOFBF, 8192) != 0) {
+        fprintf(stderr, "Could not set new buffer policy on output stream\n");
+    }
 
     // init printer
     print(fout, ESC_INIT, ESC_INIT_LENGTH);
@@ -267,8 +272,8 @@ int main(int argc, char *argv[]) {
             goto fail;
         }
 
-        if (img_w > MAX_CANVAS_WIDTH) {
-            fprintf(stderr, "Image width %u px exceeds the printer's capability (%u px)\n", img_w, MAX_CANVAS_WIDTH);
+        if (img_w > PRINTER_MAX_WIDTH) {
+            fprintf(stderr, "Image width %u px exceeds the printer's capability (%u px)\n", img_w, PRINTER_MAX_WIDTH);
             goto fail;
         }
 
@@ -282,7 +287,7 @@ int main(int argc, char *argv[]) {
             goto fail;
         }
 
-        // imgr_rgba = [R G B A  R G B A  R G B A  R G B A ...]
+        // imgr_rgba = [R G B A R G B A R G B A R G B A ...]
         for (unsigned int i = 0; i != img_grey_size; ++i) {
             const unsigned char *r = &img_rgba[i << 2];
             const unsigned char *g = &img_rgba[(i << 2) | 1];
@@ -344,7 +349,7 @@ int main(int argc, char *argv[]) {
         }
 
         // canvas size is width of a picture rounded up to nearest multiple of 8
-        const unsigned int canvas_w = (img_w + 7) & ! 0x7;
+        const unsigned int canvas_w = ((img_w + 7) >> 3) << 3;
 
         const unsigned int img_bw_size = img_h * (canvas_w >> 3);
         img_bw = (unsigned char *)calloc(img_bw_size, sizeof(unsigned char));
@@ -358,31 +363,11 @@ int main(int argc, char *argv[]) {
             config.align = 'R';
         }
 
-        // left offset
-        unsigned int offset = 0;
-        switch (config.align) {
-            case 'c':
-            case 'C':
-                offset = (canvas_w - img_w) >> 1;
-                break;
-
-            case 'r':
-            case 'R':
-                offset = canvas_w - img_w;
-                break;
-
-            case 'l':
-            case 'L':
-            case '?':
-            default:
-                offset = 0;
-        }
-
-        // compress
+        // compress bytes into bitmap
         for (unsigned int i = 0; i != img_grey_size; ++i) {
-            const unsigned int idx = config.rotate ? (img_grey_size - 1) - i: i;
+            const unsigned int idx = config.rotate == 1 ? (img_grey_size - 1) - i: i;
             if ((img_grey[idx] & 0x80) == 0) {
-                unsigned int x = i % img_w + offset;
+                unsigned int x = i % img_w;
                 unsigned int y = i / img_w;
                 unsigned int j = (y * canvas_w + x) >> 3;
                 img_bw[j] |= 0x80 >> (x & 0x07);
@@ -395,13 +380,40 @@ int main(int argc, char *argv[]) {
         lodepng_encode_file("./debug_bw_inv.png", img_bw, canvas_w, img_h, LCT_GREY, 1);
 #endif
 
+        // left offset
+        unsigned int offset = 0;
+        switch (config.align) {
+            case 'C':
+                offset = (PRINTER_MAX_WIDTH - canvas_w) >> 1;
+                break;
+
+            case 'R':
+                offset = PRINTER_MAX_WIDTH - canvas_w;
+                break;
+
+            case 'L':
+            case '?':
+            default:
+                offset = 0;
+        }
+
+        // offset have to be a multiple of 8
+        offset >>= 3;
+        offset <<= 3;
+
         // chunking, l = lines already printed, currently processing a chunk of height k
-        for (unsigned int l = 0, k = LINES_IN_BATCH; l < img_h; l += k) {
+        for (unsigned int l = 0, k = GS8L_MAX_Y; l < img_h; l += k) {
             if (k > img_h - l) {
                 k = img_h - l;
             }
 
-            unsigned int f112_p = 10 + k * (canvas_w >> 3);
+            if (offset != 0) {
+                ESC_OFFSET[2] = offset & 0xff;
+                ESC_OFFSET[3] = offset >> 8 & 0xff;
+                print(fout, ESC_OFFSET, ESC_OFFSET_LENGTH);
+            }
+
+            const unsigned int f112_p = 10 + k * (canvas_w >> 3);
             ESC_STORE[ 3] = f112_p & 0xff;
             ESC_STORE[ 4] = f112_p >> 8 & 0xff;
             ESC_STORE[13] = canvas_w & 0xff;
