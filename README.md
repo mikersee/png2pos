@@ -132,10 +132,11 @@ With no FILE, or when FILE is -, write to standard output.
 There are some tiny command line utilities available in the extras folder.
 Those are extremely tiny and safe as all is created in assembly language.
 You can customize used ESC/POS commands for your printer model.
+Nevertheless as for now this feature is available only on Linux x86 platform.
 
     $ cd extras ↵
     $ make ↵
-    $ ./tmt70cut > /dev/lp0 ↵
+    $ ./tmt70cut > /dev/usb/lp0 ↵
 
 ## Examples
 
