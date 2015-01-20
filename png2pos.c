@@ -29,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <mcheck.h>
 #endif
 
-const char *PNG2POS_VERSION = "1.6.0";
+const char *PNG2POS_VERSION = "1.6.1";
 const char *PNG2POS_BUILTON = __DATE__;
 
 // modified lodepng allocators
@@ -97,6 +97,7 @@ const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
 };
 
 // number of dots/lines in vertical direction in one F112 command
+// set to <= 128u for Epson TM-J2000/J2100
 #define LINES_IN_BATCH 256u
 
 // maximal image width printer is able to process
@@ -195,7 +196,7 @@ int main(int argc, char *argv[]) {
 
             case 'h':
                 fprintf(stderr,
-                    "png2pos is a utility to convert PNG to ESC/POS binary format for thermal printers\n"
+                    "png2pos is a utility to convert PNG to ESC/POS\n"
                     "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-p] [-o FILE] input files\n"
                     "\n"
                     "  -V          display the version number and exit\n"
@@ -203,7 +204,7 @@ int main(int argc, char *argv[]) {
                     "  -c          cut the paper at the end of job\n"
                     "  -a L|C|R    horizontal image alignment (Left, Center, Right)\n"
                     "  -r          rotate image upside down before it is printed\n"
-                    "  -p          consider input as images and pre-process them\n"
+                    "  -p          switch to photo mode (pre-process input files)\n"
                     "  -o FILE     output file\n"
                     "\n"
                     "With no FILE, or when FILE is -, write to standard output\n"

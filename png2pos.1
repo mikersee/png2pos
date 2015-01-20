@@ -1,8 +1,8 @@
-.TH png2pos 1 "January 2015" "version 1.6.0"
+.TH png2pos 1 "January 2015" "version 1.6.1"
 
 .SH NAME
 .B png2pos
-is a utility to convert PNG images to ESC/POS format — binary format used by POS thermal printers. Output file can be just sent to printer.
+is a utility to convert PNG images to ESC/POS format.
 
 .SH SYNOPSIS
 .B png2pos
@@ -10,14 +10,14 @@ is a utility to convert PNG images to ESC/POS format — binary format used by P
 
 .SH DESCRIPTION
 .B png2pos
-is a utility to convert PNG images to ESC/POS format used by POS thermal printers. Output file can be just sent to printer.
+is a utility to convert PNG images to ESC/POS format (printer control codes and escape sequences) used by POS thermal printers. Output file can be just sent to printer.
 .P
-It accepts any PNG file (B/W, greyscale, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap in ESC/POS format.
+It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap wrapped by ESC/POS commands.
 .B png2pos
-prepends needed printer initialization binary sequences and adds paper cutoff command if requested.
+prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
 .P
 .B png2pos
-utilizes mainly F50 and F112 ESC/POS commands.
+utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands.
 
 .SH OPTIONS
 .IP "\-V"
@@ -36,7 +36,7 @@ horizontal image alignment (Left, Center, Right)
 rotate image upside down before it is printed
 
 .IP "\-p"
-pre-process the images
+switch to photo mode (pre-process input files)
 
 .IP "\-o FILE"
 output file

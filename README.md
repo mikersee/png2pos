@@ -2,8 +2,8 @@
 [![Build Status](https://travis-ci.org/petrkutalek/png2pos.svg?branch=master)](https://travis-ci.org/petrkutalek/png2pos)
 [![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4TNCBPJT2R4MC)
 
-png2pos is a utility to convert PNG images to ESC/POS format — binary format used
-by POS thermal printers. Output file can be just sent to printer.
+
+png2pos is a utility to convert PNG images to ESC/POS format (printer control codes and escape sequences) used by POS thermal printers. Output file can be just sent to printer.
 
 png2pos is:
 
@@ -21,18 +21,25 @@ png2pos is:
 png2pos conforms to ESC/POS language used by these printers:
 
 * Epson TM-T70 (tested)
-* Epson TM-T88IV
+* Epson TM-T88III/IV
 * Epson TM-T90
 * Epson TM-L90
 * Epson TM-P60
-* Epson TM-J2000/J2100 (deprecated, works if LINES_IN_BATCH = 128)
-* PRT PT562A-B (pending)
-* PRT PT802A-B (pending)
+* Epson TM-J2000/J2100 (deprecated)
+* PRT PT562A-B (tested)
+* PRT PT802A-B (tested)
+
+## How does it work?
+
+It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap wrapped by ESC/POS commands.
+png2pos prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
+png2pos utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands.
+
+png2pos requires 5 × WIDTH (rounded up to multiple of 8) × HEIGHT bytes of RAM. (e.g. to process full-width image of receipt 768 pixels tall you need about 2 MiB of RAM.)
 
 ## Pricing and Support
 
-png2pos is free MIT-licensed software provided as is. *Unfortunately I am unable
-to provide you with free support*.
+png2pos is free MIT-licensed software provided as is. *Unfortunately I am unable to provide you with free support*.
 
 If you like png2pos and use it, please let me know, it motivates me in further development.
 
@@ -82,7 +89,7 @@ On Linux you can also build static binary (e.g. also based on [musl](http://www.
     $ make CC=/usr/local/musl/bin/musl-gcc static ↵
     $ make install-strip ↵
 
-Please note that musl does not support GMon (debug target).
+Please note that musl or OS X does not support GMon (debug target).
 
 ### Available make targets
 
@@ -111,7 +118,7 @@ option | value | meaning
 -c | | cut the paper at the end of job
 -a | L,C,R | horizontal image alignment (Left, Center, Right)
 -r | | rotate image upside down before it is printed
--p | | pre-process the images
+-p | | switch to photo mode (pre-process input files)
 -o | FILE | output file
 
 With no FILE, or when FILE is -, write to standard output.
@@ -119,15 +126,6 @@ With no FILE, or when FILE is -, write to standard output.
 ## Usage examples
 
     $ png2pos -c -r -a R /tmp/*.png > /dev/usb/lp0 ↵
-
-## How does it work?
-
-png2pos accepts any PNG file (B/W, greyscale, RGBA), converts it to B/W bitmap
-in ESC/POS format and prepends and adds other command sequences such as printer
-initialization and paper cut. png2pos utilizes F50 and F112 ESC/POS commands.
-
-png2pos requires 5 × WIDTH × HEIGHT bytes of RAM. (E.g. to process image of receipt 
-768 pixels tall you need about 2 MiB of RAM.)
 
 ### Examples
 
@@ -140,7 +138,7 @@ Greyscale version
 
 ![grey](docs/lena_png2pos_1_grey.png)
 
-Post-processed version (Histogram Equalization Algorithm)
+Pre-processed version (Histogram Equalization Algorithm)
 
 ![post-processed](docs/lena_png2pos_2_pp.png)
 
