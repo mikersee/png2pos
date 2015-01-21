@@ -138,6 +138,17 @@ Nevertheless as for now this feature is available only on Linux x86 platform.
     $ make ↵
     $ ./tmt70cut > /dev/usb/lp0 ↵
 
+You can use for example *init and *cut helpers in printcap file to initialize printer
+at the beginning of any job and cut the paper after processing:
+
+    tmt70|EPSON TM-T70
+        :sd=/var/spool/lpd/%P
+        :lp=/dev/usb/lp0
+        :sf
+        :mx=0
+        :bs=/usr/local/bin/tmt70init
+        :be=/usr/local/bin/tmt70cut
+
 ## Examples
 
 ### Lena
