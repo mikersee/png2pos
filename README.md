@@ -5,6 +5,8 @@
 
 png2pos is a utility to convert PNG images to ESC/POS format (printer control codes and escape sequences) used by POS thermal printers. Output file can be just sent to printer.
 
+**png2pos does not contain any Epson drivers, it is not a driver/filter replacement… png2pos is just an utility for embedded projects, for whose printing PNG files is sufficient and ideal lightweight solution.**
+
 png2pos is:
 
 * **free** and open-source
@@ -39,8 +41,7 @@ png2pos requires 5 × WIDTH (rounded up to multiple of 8) × HEIGHT bytes of RAM
 
 ## Pricing and Support
 
-png2pos is free MIT-licensed software provided as is. *Unfortunately I am unable to provide you with free support*.
-
+png2pos is free MIT-licensed software provided as is. **Unfortunately I am unable to provide you with free support**.
 If you like png2pos and use it, please let me know, it motivates me in further development.
 
 Important: png2pos will *never ever* be like Emacs; it is simple and specialized utility.

@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <unistd.h>
 #include <getopt.h>
 #include "lodepng.h"
-
 #ifdef DEBUG
 #include <mcheck.h>
 #endif
@@ -101,10 +100,14 @@ const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
 
 // number of dots/lines in vertical direction in one F112 command
 // set to <= 128u for Epson TM-J2000/J2100
+#ifndef GS8L_MAX_Y
 #define GS8L_MAX_Y 256u
+#endif
 
 // max image width printer is able to process
+#ifndef PRINTER_MAX_WIDTH
 #define PRINTER_MAX_WIDTH 512u
+#endif
 
 // app configuration
 struct {
@@ -151,6 +154,14 @@ void print(FILE *stream, const unsigned char *buffer, const int length) {
 }
 
 int main(int argc, char *argv[]) {
+    {
+        // PRINTER_MAX_WIDTH must be divisible by 8!!
+        if (PRINTER_MAX_WIDTH % 8 != 0) {
+            fprintf(stderr, "FATAL ERROR: PRINTER_MAX_WIDTH MUST BE DIVISIBLE BY 8, PLEASE RECOMPILE\n");
+            return EXIT_FAILURE;
+        }
+    }
+
 #ifdef DEBUG
     mtrace();
 #endif
