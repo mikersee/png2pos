@@ -25,9 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <unistd.h>
 #include <getopt.h>
 #include "lodepng.h"
-#ifdef DEBUG
-#include <mcheck.h>
-#endif
 
 const char *PNG2POS_VERSION = "1.6.1";
 const char *PNG2POS_BUILTON = __DATE__;
@@ -67,7 +64,7 @@ unsigned char ESC_OFFSET[ESC_OFFSET_LENGTH] = {
     // GS L, Set left margin, p. 169
     0x1d, 0x4c, 
     // nl, nh
-       0,    0
+    0x00, 0x00
 };
 
 #define ESC_STORE_LENGTH 17
@@ -75,7 +72,7 @@ unsigned char ESC_STORE[ESC_STORE_LENGTH] = {
     // GS 8 L, Store the graphics data in the print buffer (raster format), p. 252
     0x1d, 0x38, 0x4c,
     // p1 p2 p3 p4
-    0x0b,    0,    0,    0, 
+    0x0b, 0x00, 0x00, 0x00, 
     // Function 112
     0x30, 0x70, 0x30,
     // bx by, zoom
@@ -83,9 +80,9 @@ unsigned char ESC_STORE[ESC_STORE_LENGTH] = {
     // c, single-color printing model
     0x31, 
     // xl, xh, number of dots in the horizontal direction
-       0,    0, 
+    0x00, 0x00, 
     // yl, yh, number of dots in the vertical direction
-       0,    0 
+    0x00, 0x00
 };
 
 #define ESC_FLUSH_LENGTH 7
@@ -93,7 +90,7 @@ const unsigned char ESC_FLUSH[ESC_FLUSH_LENGTH] = {
     // GS ( L, Print the graphics data in the print buffer, p. 241
     // Moves print position to the left side of the print area after 
     // printing of graphics data is completed
-    0x1d, 0x28, 0x4c, 0x02,    0, 0x30,
+    0x1d, 0x28, 0x4c, 0x02, 0x00, 0x30,
     // Fn 50
     0x32 
 };
@@ -161,10 +158,6 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
     }
-
-#ifdef DEBUG
-    mtrace();
-#endif
 
     unsigned char *img_rgba = NULL;
     unsigned char *img_grey = NULL;
@@ -288,7 +281,7 @@ int main(int argc, char *argv[]) {
             goto fail;
         }
 
-        unsigned int histogram[256] = { 0 };
+        unsigned int histogram[256] = {0};
 
         // convert RGBA to greyscale
         const unsigned int img_grey_size = img_h * img_w;
@@ -345,7 +338,7 @@ int main(int argc, char *argv[]) {
             };
             for (unsigned int i = 0; i != img_grey_size; ++i) {
                 const int o = img_grey[i];
-                const int n = (o & 0x80) == 0 ? 0 : 0xff;
+                const int n = (o & 0x80) == 0 ? 0x00 : 0xff;
                 img_grey[i] = n;
                 const int x = i % img_w;
                 const int y = i / img_w;
@@ -354,7 +347,7 @@ int main(int argc, char *argv[]) {
                     const int x0 = x + matrix[j].dx;
                     const int y0 = y + matrix[j].dy;
                     if (x0 >= img_w || x0 < 0 || y0 >= img_h) continue;
-                    img_grey[x0 + img_w * y0] = rebound(img_grey[x0 + img_w * y0] + (o - n) / 8, 0, 0xff);
+                    img_grey[x0 + img_w * y0] = rebound(img_grey[x0 + img_w * y0] + (o - n) / 8, 0x00, 0xff);
                 }
             }
         }
@@ -409,8 +402,7 @@ int main(int argc, char *argv[]) {
         }
 
         // offset have to be a multiple of 8
-        offset >>= 3;
-        offset <<= 3;
+        offset = (offset >> 3) << 3;
 
         // chunking, l = lines already printed, currently processing a chunk of height k
         for (unsigned int l = 0, k = GS8L_MAX_Y; l < img_h; l += k) {
@@ -457,10 +449,6 @@ fail:
     if (fout != NULL && fout != stdout) {
        fclose(fout), fout = NULL;
     }
-
-#ifdef DEBUG
-    muntrace();
-#endif
 
     return ret;
 }

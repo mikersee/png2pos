@@ -54,7 +54,7 @@ Please, if you use GPG, verify also attached GPG signature:
 
 Import public key into temporary keyring (you can import it into your permanent keyring of course) and verify ZIP file's ASC signature:
 
-    $ wget -O - https://forers.com/494CD31C.asc | gpg --no-default-keyring --keyring ./gpg-png2pos.tmp --import ↵
+    $ curl https://forers.com/494CD31C.asc | gpg --no-default-keyring --keyring ./gpg-png2pos.tmp --import ↵
     gpg: key 494CD31C: public key "Petr Kutalek <petr.kutalek@forers.com>" imported
     gpg: Total number processed: 1
     gpg: imported: 1 (RSA: 1)
@@ -90,7 +90,9 @@ On Linux you can also build static binary (e.g. also based on [musl](http://www.
     $ make CC=/usr/local/musl/bin/musl-gcc static ↵
     $ make install-strip ↵
 
-Please note that musl or OS X does not support GMon (debug target).
+**Please, do not forget to specify your printer's head width in pixels via PRINTER_MAX_WIDTH constant
+if it differs from default value of 512 px.** (You probably need to specify 384 for 56 mm printers.)
+PRINTER_MAX_WIDTH must be divisible by 8.
 
 ### Available make targets
 
@@ -128,28 +130,6 @@ With no FILE, or when FILE is -, write to standard output.
 
     $ png2pos -c -r /tmp/*.png > /dev/usb/lp0 ↵
 
-## Extras
-
-There are some tiny command line utilities available in the extras folder.
-Those are extremely tiny and safe as all is created in assembly language.
-You can customize used ESC/POS commands for your printer model.
-Nevertheless as for now this feature is available only on Linux x86 platform.
-
-    $ cd extras ↵
-    $ make ↵
-    $ ./tmt70cut > /dev/usb/lp0 ↵
-
-You can use for example *init and *cut helpers in printcap file to initialize printer
-at the beginning of any job and cut the paper after processing:
-
-    tmt70|EPSON TM-T70
-        :sd=/var/spool/lpd/%P
-        :lp=/dev/usb/lp0
-        :sf
-        :mx=0
-        :bs=/usr/local/bin/tmt70init
-        :be=/usr/local/bin/tmt70cut
-
 ## Examples
 
 ### Lena
@@ -168,4 +148,3 @@ Pre-processed version (Histogram Equalization Algorithm)
 Produced B/W dithered version (Atkinson Dithering Algorithm)
 
 ![B/W](docs/lena_png2pos_3_bw.png)
-
