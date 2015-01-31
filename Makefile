@@ -6,7 +6,7 @@ CFLAGS += -std=c99 -O2 -Wall -pedantic \
 	-DLODEPNG_NO_COMPILE_CPP \
 	-DLODEPNG_NO_COMPILE_ALLOCATORS \
 	-DLODEPNG_NO_COMPILE_ENCODER
-LDFLAGS += -O2 -Wall -pedantic
+LDFLAGS +=
 PREFIX := /usr/local
 
 OBJS = lodepng.o png2pos.o
@@ -46,7 +46,7 @@ static : all
 rpi : CFLAGS += -march=armv6j -mfpu=vfp -mfloat-abi=hard
 rpi : strip
 
-debug : CFLAGS += -g -DDEBUG -DLODEPNG_COMPILE_ENCODER
+debug : CFLAGS += -DDEBUG -DLODEPNG_COMPILE_ENCODER
 debug : all
 
 profiled :
