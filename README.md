@@ -48,7 +48,7 @@ Important: png2pos will *never ever* be like Emacs; it is simple and specialized
 
 ## Precompiled binary packages
 
-You can find precompiled binary packages for some common platforms in [Releases](https://github.com/petrkutalek/png2pos/releases) section.
+There are available prepared builds for some common platforms in [Releases](https://github.com/petrkutalek/png2pos/releases) section.
 
 Please, if you use GPG, verify also attached GPG signature:
 
