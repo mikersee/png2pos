@@ -196,6 +196,7 @@ int main(int argc, char *argv[]) {
             case 't':
                 config.threshold = strtoul(optarg, NULL, 0);
                 if (config.threshold > 255) {
+                    config.threshold = 0x80;
                     fprintf(stderr, "B/W threshold must be in the interval <0; 255>. Falling back to the default value 0x80\n");
                 }
                 break;
@@ -457,7 +458,7 @@ fail:
     free(img_bw), img_bw = NULL;
 
     if (fout != NULL && fout != stdout) {
-       fclose(fout), fout = NULL;
+        fclose(fout), fout = NULL;
     }
 
     return ret;
