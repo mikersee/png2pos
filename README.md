@@ -116,20 +116,6 @@ analyze | clang static analyzer (OS X)
 
 png2pos has no lib dependencies and is easy to build and run on Linux, Mac and Windows.
 
-## Command line options
-
-option | value | meaning
-:----- | :---- | :------
--V | | display the version number and exit
--h | | display this short help and exit
--c | | cut the paper at the end of job
--a | L,C,R | horizontal image alignment (Left, Center, Right)
--r | | rotate image upside down before it is printed
--p | | switch to photo mode (pre-process input files)
--o | FILE | output file
-
-With no FILE, or when FILE is -, write to standard output.
-
 ## Usage examples
 
     $ png2pos -c -r /tmp/*.png > /dev/usb/lp0 ↵
