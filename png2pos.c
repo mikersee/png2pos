@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <getopt.h>
 #include "lodepng.h"
 
-const char *PNG2POS_VERSION = "1.6.1";
+const char *PNG2POS_VERSION = "1.6.2";
 const char *PNG2POS_BUILTON = __DATE__;
 
 // modified lodepng allocators
@@ -113,12 +113,14 @@ struct {
     char align;
     unsigned int rotate;
     const char *output;
+    unsigned int threshold;
 } config = {
     .cut = 0,
     .photo = 0,
     .align = '?',
     .rotate = 0,
-    .output = NULL
+    .output = NULL,
+    .threshold = 0x80
 };
 
 FILE *fout = NULL;
@@ -169,7 +171,7 @@ int main(int argc, char *argv[]) {
 
     opterr = 0;
     int optc = -1;
-    while ((optc = getopt(argc, argv, ":Vhca:rpo:")) != -1) {
+    while ((optc = getopt(argc, argv, ":Vhca:rt:po:")) != -1) {
         switch (optc) {
             case 'o':
                 config.output = optarg;
@@ -191,6 +193,13 @@ int main(int argc, char *argv[]) {
                 config.rotate = 1;
                 break;
 
+            case 't':
+                config.threshold = strtoul(optarg, NULL, 0);
+                if (config.threshold > 255) {
+                    fprintf(stderr, "B/W threshold must be in the interval <0; 255>. Falling back to the default value 0x80\n");
+                }
+                break;
+
             case 'p':
                 config.photo = 1;
                 break;
@@ -204,20 +213,21 @@ int main(int argc, char *argv[]) {
             case 'h':
                 fprintf(stderr,
                     "png2pos is a utility to convert PNG to ESC/POS\n"
-                    "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-p] [-o FILE] input files\n"
+                    "Usage: %s [-V] [-h] [-c] [-a L|C|R] [-r] [-t THRESHOLD] [-p] [-o FILE] input files\n"
                     "\n"
-                    "  -V          display the version number and exit\n"
-                    "  -h          display this short help and exit\n"
-                    "  -c          cut the paper at the end of job\n"
-                    "  -a L|C|R    horizontal image alignment (Left, Center, Right)\n"
-                    "  -r          rotate image upside down before it is printed\n"
-                    "  -p          switch to photo mode (pre-process input files)\n"
-                    "  -o FILE     output file\n"
+                    "  -V           display the version number and exit\n"
+                    "  -h           display this short help and exit\n"
+                    "  -c           cut the paper at the end of job\n"
+                    "  -a L|C|R     horizontal image alignment (Left, Center, Right)\n"
+                    "  -r           rotate image upside down before it is printed\n"
+                    "  -t THRESHOLD set the treshold value for conversion to B/W\n"
+                    "  -p           switch to photo mode (pre-process input files)\n"
+                    "  -o FILE      output file\n"
                     "\n"
                     "With no FILE, or when FILE is -, write to standard output\n"
                     "\n"
                     "Please read the manual page (man %s)\n"
-                    "Report bugs to Petr Kutalek <petr@kutalek.cz>\n"
+                    "Report bugs at https://github.com/petrkutalek/png2pos/issues\n"
                     "(c) Petr Kutalek <petr@kutalek.cz>, 2012 - 2015, Licensed under the MIT license\n"
                     ,
                     BINARY_NAME, BINARY_NAME
@@ -338,7 +348,7 @@ int main(int argc, char *argv[]) {
             };
             for (unsigned int i = 0; i != img_grey_size; ++i) {
                 const int o = img_grey[i];
-                const int n = (o & 0x80) == 0 ? 0x00 : 0xff;
+                const int n = o <= config.threshold ? 0x00 : 0xff;
                 img_grey[i] = n;
                 const int x = i % img_w;
                 const int y = i / img_w;
@@ -370,7 +380,7 @@ int main(int argc, char *argv[]) {
         // compress bytes into bitmap
         for (unsigned int i = 0; i != img_grey_size; ++i) {
             const unsigned int idx = config.rotate == 1 ? (img_grey_size - 1) - i: i;
-            if ((img_grey[idx] & 0x80) == 0) {
+            if (img_grey[idx] <= config.threshold) {
                 unsigned int x = i % img_w;
                 unsigned int y = i / img_w;
                 unsigned int j = (y * canvas_w + x) >> 3;

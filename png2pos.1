@@ -1,4 +1,4 @@
-.TH png2pos 1 "January 2015" "version 1.6.1"
+.TH png2pos 1 "February 2015" "version 1.6.2"
 
 .SH NAME
 .B png2pos
@@ -6,7 +6,7 @@ is a utility to convert PNG images to ESC/POS format
 
 .SH SYNOPSIS
 .B png2pos
-[-V] [-h] [-c] [-a L|C|R] [-r] [-p] [-o FILE] input files
+[-V] [-h] [-c] [-a L|C|R] [-r] [-t THRESHOLD] [-p] [-o FILE] input files
 
 .SH DESCRIPTION
 .B png2pos
@@ -34,6 +34,9 @@ horizontal image alignment (Left, Center, Right)
 
 .IP "\-r"
 rotate image upside down before it is printed
+
+.IP "\-t THRESHOLD"
+set the treshold value for conversion to B/W, falling back to the default value 0x80 if not set. THRESHOLD must be in the interval <0; 255>, the lower value set, the more bright output created.
 
 .IP "\-p"
 switch to photo mode (pre-process input files)
