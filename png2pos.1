@@ -36,7 +36,7 @@ horizontal image alignment (Left, Center, Right)
 rotate image upside down before it is printed
 
 .IP "\-t THRESHOLD"
-set the treshold value for conversion to B/W, falling back to the default value 0x80 if not set. THRESHOLD must be in the interval <0; 255>, the lower value set, the more bright output created.
+set the treshold value for conversion to B/W, falling back to the default value 0x80 if not set. THRESHOLD must be in the interval <0; 255>, the lower value set, the more bright output created. Value may include a "0x" prefix, and the number will be read in base 16, a "0" prefix for base 8 (octal); otherwise, a 10 (decimal) base is taken.
 
 .IP "\-p"
 switch to photo mode (pre-process input files)

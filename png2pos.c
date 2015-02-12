@@ -292,11 +292,11 @@ int main(int argc, char *argv[]) {
             goto fail;
         }
 
-        unsigned int histogram[256] = {0};
+        unsigned int histogram[256] = { 0 };
 
         // convert RGBA to greyscale
         const unsigned int img_grey_size = img_h * img_w;
-        img_grey = (unsigned char *)calloc(img_grey_size, sizeof(unsigned char));
+        img_grey = (unsigned char *)calloc(img_grey_size, 1);
         if (!img_grey) {
             fprintf(stderr, "Could not allocate enough memory\n");
             goto fail;
@@ -330,6 +330,7 @@ int main(int argc, char *argv[]) {
             for (unsigned int i = 0; i != img_grey_size; ++i) {
                 img_grey[i] = 255 * histogram[img_grey[i]] / img_grey_size;
             }
+            config.threshold = 255 * histogram[config.threshold] / img_grey_size;
 
 #ifdef DEBUG
             lodepng_encode_file("./debug_g_pp.png", img_grey, img_w, img_h, LCT_GREY, 8);
@@ -348,16 +349,18 @@ int main(int argc, char *argv[]) {
                 { .dx =  0, .dy = 2 }
             };
             for (unsigned int i = 0; i != img_grey_size; ++i) {
-                const int o = img_grey[i];
-                const int n = o <= config.threshold ? 0x00 : 0xff;
+                const unsigned int o = img_grey[i];
+                const unsigned int n = o <= config.threshold ? 0x00 : 0xff;
                 img_grey[i] = n;
-                const int x = i % img_w;
-                const int y = i / img_w;
+                const unsigned int x = i % img_w;
+                const unsigned int y = i / img_w;
 
                 for (unsigned int j = 0; j != 6; ++j) {
                     const int x0 = x + matrix[j].dx;
                     const int y0 = y + matrix[j].dy;
-                    if (x0 >= img_w || x0 < 0 || y0 >= img_h) continue;
+                    if (x0 >= img_w || x0 < 0 || y0 >= img_h) {
+                        continue;
+                    }
                     img_grey[x0 + img_w * y0] = rebound(img_grey[x0 + img_w * y0] + (o - n) / 8, 0x00, 0xff);
                 }
             }
@@ -367,7 +370,7 @@ int main(int argc, char *argv[]) {
         const unsigned int canvas_w = ((img_w + 7) >> 3) << 3;
 
         const unsigned int img_bw_size = img_h * (canvas_w >> 3);
-        img_bw = (unsigned char *)calloc(img_bw_size, sizeof(unsigned char));
+        img_bw = (unsigned char *)calloc(img_bw_size, 1);
         if (!img_bw) {
             fprintf(stderr, "Could not allocate enough memory\n");
             goto fail;
@@ -380,12 +383,11 @@ int main(int argc, char *argv[]) {
 
         // compress bytes into bitmap
         for (unsigned int i = 0; i != img_grey_size; ++i) {
-            const unsigned int idx = config.rotate == 1 ? (img_grey_size - 1) - i: i;
+            const unsigned int idx = config.rotate == 1 ? img_grey_size - 1 - i: i;
             if (img_grey[idx] <= config.threshold) {
-                unsigned int x = i % img_w;
-                unsigned int y = i / img_w;
-                unsigned int j = (y * canvas_w + x) >> 3;
-                img_bw[j] |= 0x80 >> (x & 0x07);
+                const unsigned int x = i % img_w;
+                const unsigned int y = i / img_w;
+                img_bw[(y * canvas_w + x) >> 3] |= 0x80 >> (x & 0x07);
             }
         }
 
