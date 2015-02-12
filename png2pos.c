@@ -320,6 +320,22 @@ int main(int argc, char *argv[]) {
         lodepng_encode_file("./debug_g.png", img_grey, img_w, img_h, LCT_GREY, 8);
 #endif
 
+        {
+            // -p hints
+            unsigned int colors = 0;
+            for (unsigned int i = 0; i != 256; ++i) {
+                if (histogram[i] > 0) {
+                    ++colors;
+                }
+            }
+            if ((colors < 16) && config.photo) {
+                fprintf(stderr, "Image seems to be B/W. -p is probably not good option this time\n");
+            }
+            if ((colors >= 16) && !config.photo) {
+                fprintf(stderr, "Image seems to be grayscale or colored. Maybe you should use options -p and -t for better results\n");
+            }
+        }
+
         // post-processing
         // convert to B/W bitmap
         if (config.photo) {
