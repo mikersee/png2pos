@@ -332,7 +332,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "Image seems to be B/W. -p is probably not good option this time\n");
             }
             if ((colors >= 16) && !config.photo) {
-                fprintf(stderr, "Image seems to be grayscale or colored. Maybe you should use options -p and -t for better results\n");
+                fprintf(stderr, "Image seems to be greyscale or colored. Maybe you should use options -p and -t for better results\n");
             }
         }
 
