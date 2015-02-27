@@ -26,7 +26,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <getopt.h>
 #include "lodepng.h"
 
+#ifdef DEBUG
+const char *PNG2POS_VERSION = "DEBUG!";
+#else
 const char *PNG2POS_VERSION = "1.6.2";
+#endif
 const char *PNG2POS_BUILTON = __DATE__;
 
 // modified lodepng allocators
@@ -381,6 +385,19 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+
+#ifdef DEBUG
+            // draw histogram via gnuplot, write dataset
+            FILE *fhist = fopen("./debug_histogram.txt", "w");
+            if (fhist) {
+                fprintf(fhist, "#hue\tcount\n");
+                for (unsigned int i = 0; i != 256; ++i) {
+                    fprintf(fhist, "%d\t%d\n", i, histogram[i]);
+                }
+                fprintf(fhist, "#EOF\n");
+            }
+            fclose(fhist), fhist = NULL;
+#endif
 
         // canvas size is width of a picture rounded up to nearest multiple of 8
         const unsigned int canvas_w = ((img_w + 7) >> 3) << 3;
