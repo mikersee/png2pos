@@ -138,3 +138,7 @@ Pre-processed version (Histogram Equalization Algorithm)
 Produced B/W dithered version (Atkinson Dithering Algorithm)
 
 ![B/W](docs/lena_png2pos_3_bw.png)
+
+Histograms (raw and pre-processed image)
+
+![histograms](docs/lena_png2pos_histogram.png)

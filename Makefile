@@ -22,7 +22,7 @@ strip : $(EXEC)
 .PHONY : clean
 clean :
 	-rm -f $(OBJS) $(EXEC)
-	-rm *.pos *.gz debug_*.png
+	-rm *.pos *.gz debug_*.png debug_*.txt
 
 $(EXEC) : $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)
@@ -48,6 +48,7 @@ rpi : strip
 
 debug : CFLAGS += -DDEBUG -DLODEPNG_COMPILE_ENCODER
 debug : all
+	-gnuplot histogram.gnuplot
 
 profiled :
 	make CFLAGS="$(CFLAGS) -fprofile-generate" $(EXEC)

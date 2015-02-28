@@ -324,6 +324,19 @@ int main(int argc, char *argv[]) {
         lodepng_encode_file("./debug_g.png", img_grey, img_w, img_h, LCT_GREY, 8);
 #endif
 
+#ifdef DEBUG
+            // draw histogram via gnuplot, write dataset
+            FILE *fhist = fopen("./debug_histogram.txt", "w");
+            if (fhist) {
+                fprintf(fhist, "#hue\tcount\n");
+                for (unsigned int i = 0; i != 256; ++i) {
+                    fprintf(fhist, "%d\t%d\n", i, histogram[i]);
+                }
+                fprintf(fhist, "#EOF\n");
+            }
+            fclose(fhist), fhist = NULL;
+#endif
+
         {
             // -p hints
             unsigned int colors = 0;
@@ -356,6 +369,27 @@ int main(int argc, char *argv[]) {
             lodepng_encode_file("./debug_g_pp.png", img_grey, img_w, img_h, LCT_GREY, 8);
 #endif
 
+#ifdef DEBUG
+            for (unsigned int i = 1; i != 256; ++i) {
+                histogram[i] = 0;
+            }
+
+           for (unsigned int i = 0; i != img_grey_size; ++i) {
+                ++histogram[img_grey[i]];
+            }
+
+            // draw histogram via gnuplot, write dataset
+            FILE *fhist = fopen("./debug_histogram_pp.txt", "w");
+            if (fhist) {
+                fprintf(fhist, "#hue\tcount\n");
+                for (unsigned int i = 0; i != 256; ++i) {
+                    fprintf(fhist, "%d\t%d\n", i, histogram[i]);
+                }
+                fprintf(fhist, "#EOF\n");
+            }
+            fclose(fhist), fhist = NULL;
+#endif
+
             // Atkinson Dithering Algorithm
             const struct {
                 int dx;
@@ -385,19 +419,6 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-
-#ifdef DEBUG
-            // draw histogram via gnuplot, write dataset
-            FILE *fhist = fopen("./debug_histogram.txt", "w");
-            if (fhist) {
-                fprintf(fhist, "#hue\tcount\n");
-                for (unsigned int i = 0; i != 256; ++i) {
-                    fprintf(fhist, "%d\t%d\n", i, histogram[i]);
-                }
-                fprintf(fhist, "#EOF\n");
-            }
-            fclose(fhist), fhist = NULL;
-#endif
 
         // canvas size is width of a picture rounded up to nearest multiple of 8
         const unsigned int canvas_w = ((img_w + 7) >> 3) << 3;
