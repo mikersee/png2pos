@@ -6,7 +6,7 @@ CFLAGS += -std=c99 -O2 -Wall -pedantic \
 	-DLODEPNG_NO_COMPILE_CPP \
 	-DLODEPNG_NO_COMPILE_ALLOCATORS \
 	-DLODEPNG_NO_COMPILE_ENCODER
-LDFLAGS +=
+LDFLAGS += 
 PREFIX := /usr/local
 
 OBJS = lodepng.o png2pos.o
@@ -25,7 +25,7 @@ clean :
 	-rm *.pos *.gz debug_*.png debug_*.txt
 
 $(EXEC) : $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $@ 
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
@@ -48,7 +48,7 @@ rpi : strip
 
 debug : CFLAGS += -DDEBUG -DLODEPNG_COMPILE_ENCODER
 debug : all
-	-gnuplot histogram.gnuplot
+	#-gnuplot histogram.gnuplot
 
 profiled :
 	make CFLAGS="$(CFLAGS) -fprofile-generate" $(EXEC)

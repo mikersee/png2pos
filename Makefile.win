@@ -6,7 +6,7 @@ CFLAGS += -std=gnu99 -O2 -Wall -pedantic \
 	-DLODEPNG_NO_COMPILE_CPP \
 	-DLODEPNG_NO_COMPILE_ALLOCATORS \
 	-DLODEPNG_NO_COMPILE_ENCODER
-LDFLAGS += 
+LDFLAGS += -lm
 
 OBJS = lodepng.o png2pos.o png2pos.res
 EXEC = png2pos.exe
@@ -22,7 +22,7 @@ clean :
 	-del *.pos *.gz debug_*.png
 
 $(EXEC) : $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) -o $@ $<

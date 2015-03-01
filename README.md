@@ -13,6 +13,7 @@ png2pos is:
 * rock **stable**
 * highly **optimized**, fast, tiny and lightweight (few KiBs binary, no lib dependencies)
 * **secure** (does not require any escalated privileges)
+* using **high-quality** algorithms
 * easy to use
 * multiplatform (tested on Linux — x86 and ARM/Raspberry Pi, OS X and Windows)
 * well **tested**
@@ -38,6 +39,10 @@ It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalizat
 ESC/POS is a printer language. The “POS” stands for “Point of Sale”, the “ESC” stands for “escape” because command instructions are escaped with a special characters. png2pos utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands. It also prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
 
 png2pos requires 5 × WIDTH (rounded up to multiple of 8) × HEIGHT bytes of RAM. (e.g. to process full-width image of receipt 768 pixels tall you need about 2 MiB of RAM.)
+
+png2pos converts RGBA images into greyscale version via algorithm compliant with CIE, BT.709. (RGBA → RGB → R'G'B' (gamma 2.2) → luma Y' → lightness L*). For performance reasons png2pos uses pre-calculated lookup tables and integer based math.
+
+![gamma](docs/gamma.png)
 
 ## Pricing and Support
 
