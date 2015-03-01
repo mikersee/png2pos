@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <getopt.h>
 #include "lodepng.h"
 
-const char *PNG2POS_VERSION = "1.6.3";
+const char *PNG2POS_VERSION = "1.6.4";
 const char *PNG2POS_BUILTON = __DATE__;
 
 // modified lodepng allocators
@@ -314,7 +314,7 @@ int main(int argc, char *argv[]) {
     print(fout, ESC_INIT, ESC_INIT_LENGTH);
     fflush(fout);
 
-    // for each input files
+    // for each input file
     while (optind != argc) {
         const char *input = argv[optind++];
 
@@ -366,20 +366,18 @@ int main(int argc, char *argv[]) {
         free(img_rgba), img_rgba = NULL;
 
 #ifdef DEBUG
-        lodepng_encode_file("./debug_g.png", img_grey, img_w, img_h, LCT_GREY, 8);
-#endif
+        lodepng_encode_file("debug/g.png", img_grey, img_w, img_h, LCT_GREY, 8);
 
-#ifdef DEBUG
-            // draw histogram via gnuplot, write dataset
-            FILE *fhist = fopen("./debug_histogram.txt", "w");
-            if (fhist) {
-                fprintf(fhist, "#hue\tcount\n");
-                for (unsigned int i = 0; i != 256; ++i) {
-                    fprintf(fhist, "%d\t%d\n", i, histogram[i]);
-                }
-                fprintf(fhist, "#EOF\n");
+        // draw histogram via gnuplot, write dataset
+        FILE *fhist = fopen("debug/histogram.txt", "w");
+        if (fhist) {
+            fprintf(fhist, "#hue\tcount\n");
+            for (unsigned int i = 0; i != 256; ++i) {
+                fprintf(fhist, "%d\t%d\n", i, histogram[i]);
             }
-            fclose(fhist), fhist = NULL;
+            fprintf(fhist, "#EOF\n");
+        }
+        fclose(fhist), fhist = NULL;
 #endif
 
         {
@@ -390,17 +388,17 @@ int main(int argc, char *argv[]) {
                     ++colors;
                 }
             }
-            if ((colors < 16) && config.photo) {
+            if (colors < 16 && config.photo == 1) {
                 fprintf(stderr, "Image seems to be B/W. -p is probably not good option this time\n");
             }
-            if ((colors >= 16) && !config.photo) {
+            if (colors >= 16 && config.photo == 0) {
                 fprintf(stderr, "Image seems to be greyscale or colored. Maybe you should use options -p and -t for better results\n");
             }
         }
 
         // post-processing
         // convert to B/W bitmap
-        if (config.photo) {
+        if (config.photo == 1) {
             // Histogram Equalization Algorithm
             for (unsigned int i = 1; i != 256; ++i) {
                 histogram[i] += histogram[i - 1];
@@ -409,22 +407,20 @@ int main(int argc, char *argv[]) {
                 img_grey[i] = 255 * histogram[img_grey[i]] / img_grey_size;
             }
             config.threshold = 255 * histogram[config.threshold] / img_grey_size;
+            fprintf(stderr, "Threshold shift, new value = %d\n", config.threshold);
 
 #ifdef DEBUG
-            lodepng_encode_file("./debug_g_pp.png", img_grey, img_w, img_h, LCT_GREY, 8);
-#endif
+            lodepng_encode_file("debug/g_pp.png", img_grey, img_w, img_h, LCT_GREY, 8);
 
-#ifdef DEBUG
             for (unsigned int i = 1; i != 256; ++i) {
                 histogram[i] = 0;
             }
-
            for (unsigned int i = 0; i != img_grey_size; ++i) {
                 ++histogram[img_grey[i]];
             }
 
             // draw histogram via gnuplot, write dataset
-            FILE *fhist = fopen("./debug_histogram_pp.txt", "w");
+            FILE *fhist = fopen("debug/histogram_pp.txt", "w");
             if (fhist) {
                 fprintf(fhist, "#hue\tcount\n");
                 for (unsigned int i = 0; i != 256; ++i) {
@@ -450,6 +446,7 @@ int main(int argc, char *argv[]) {
             for (unsigned int i = 0; i != img_grey_size; ++i) {
                 const unsigned int o = img_grey[i];
                 const unsigned int n = o <= config.threshold ? 0x00 : 0xff;
+                const int d = (signed int)(o - n) / 8;
                 img_grey[i] = n;
                 const unsigned int x = i % img_w;
                 const unsigned int y = i / img_w;
@@ -460,7 +457,7 @@ int main(int argc, char *argv[]) {
                     if (x0 >= img_w || x0 < 0 || y0 >= img_h) {
                         continue;
                     }
-                    img_grey[x0 + img_w * y0] = rebound(img_grey[x0 + img_w * y0] + (o - n) / 8, 0x00, 0xff);
+                    img_grey[x0 + img_w * y0] = rebound(img_grey[x0 + img_w * y0] + d, 0x00, 0xff);
                 }
             }
         }
@@ -493,7 +490,10 @@ int main(int argc, char *argv[]) {
         free(img_grey), img_grey = NULL;
 
 #ifdef DEBUG
-        lodepng_encode_file("./debug_bw_inv.png", img_bw, canvas_w, img_h, LCT_GREY, 1);
+        //for (unsigned int i = 0; i != img_bw_size; ++i) {
+        //    img_bw[i] = ~img_bw[i];
+        //}
+        lodepng_encode_file("debug/bw_inv.png", img_bw, canvas_w, img_h, LCT_GREY, 1);
 #endif
 
         // left offset
