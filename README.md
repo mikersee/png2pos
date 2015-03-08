@@ -5,7 +5,7 @@
 
 png2pos is a utility to convert PNG images to ESC/POS format (printer control codes and escape sequences) used by POS thermal printers. Output file can be just sent to printer.
 
-**png2pos does not contain any Epson drivers, it is not a driver/filter replacement… png2pos is just an utility for embedded projects, for whose printing PNG files is sufficient and ideal lightweight solution.**
+**png2pos does not contain any Epson drivers, it is not a driver/filter replacement… png2pos is just a utility for embedded projects, for whose printing PNG files is sufficient and ideal lightweight solution.**
 
 png2pos is:
 
@@ -36,7 +36,7 @@ png2pos conforms to ESC/POS language used by these printers:
 
 It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap wrapped by ESC/POS commands.
 
-ESC/POS is a printer language. The “POS” stands for “Point of Sale”, the “ESC” stands for “escape” because command instructions are escaped with a special characters. png2pos utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands. It also prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
+ESC/POS is a printer language. The “POS” stands for “Point of Sale”, the “ESC” stands for “escape” because command instructions are escaped with a special characters. png2pos utilizes ```ESC@```, ```GSV```, ```GSL```, ```GS8L``` and ```GS(L``` ESC/POS commands. It also prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
 
 png2pos requires 5 × WIDTH (rounded up to multiple of 8) × HEIGHT bytes of RAM. (e.g. to process full-width image of receipt 768 pixels tall you need about 2 MiB of RAM.)
 
@@ -50,6 +50,8 @@ png2pos is free MIT-licensed software provided as is. **Unfortunately I am unabl
 If you like png2pos and use it, please let me know, it motivates me in further development.
 
 Important: png2pos will *never ever* be like Emacs; it is simple and specialized utility.
+
+There is also an alternative project called [png2escpos](https://github.com/twg/png2escpos) created by The Working Group Inc. It's younger, simpler and uses libpng. png2pos is in all aspects mature, nevertheless you may like alternative even more.
 
 ## Precompiled binary packages
 
