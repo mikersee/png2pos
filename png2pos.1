@@ -1,93 +1,84 @@
-.TH png2pos 1 "February 2015" "version 1.6.2"
-
+.TH png2pos 1
 .SH NAME
-.B png2pos
-is a utility to convert PNG images to ESC/POS format
-
+png2pos \- a utility to convert PNG images to ESC/POS format
 .SH SYNOPSIS
-.B png2pos
-[-V] [-h] [-c] [-a L|C|R] [-r] [-t THRESHOLD] [-p] [-o FILE] input files
-
+\fBpng2pos\fR
+[\fB\-V\fR]
+[\fB\-h\fR]
+[\fB\-c\fR]
+[\fB\-a\fR \fIL|C|R\fR]
+[\fB\-r\fR]
+[\fB\-t\fR \fITHRESHOLD\fR]
+[\fB\-p\fR]
+[\fB\-o\fR \fIFILE\fR]
+input files ...
 .SH DESCRIPTION
-.B png2pos
-is a utility to convert PNG images to ESC/POS format (printer control codes and escape sequences) used by POS thermal printers. Output file can be just sent to printer.
-.P
-It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm converts it to B/W bitmap wrapped by ESC/POS commands.
-.B png2pos
-prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
-.P
-.B png2pos
-utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands.
-
+png2pos is a utility to convert PNG images to ESC/POS format (printer control codes and escape sequences) used by POS thermal printers.
+Output file can be just sent to printer.
+.PP
+It accepts any PNG file (B/W, greyscale, RGB, RGBA), applies Histogram Equalization Algorithm and via Atkinson Dithering Algorithm
+converts it to B/W bitmap wrapped by ESC/POS commands.
+png2pos prepends needed printer initialization binary sequences and adds paper cutoff command, if requested.
+.PP
+png2pos utilizes ESC@, GSV, GSL, GS8L and GS(L ESC/POS commands.
 .SH OPTIONS
-.IP "\-V"
+.TP
+.BR \-V
 display the version number and exit
-
-.IP "\-h"
+.TP
+.BR \-h
 display this short help and exit
-
-.IP "\-c"
+.TP
+.BR \-c
 cut the paper at the end of job
-
-.IP "\-a L|C|R"
+.TP
+.BR "\-a \fIL|C|R\fR"
 horizontal image alignment (Left, Center, Right)
-
-.IP "\-r"
+.TP
+.BR \-r
 rotate image upside down before it is printed
-
-.IP "\-t THRESHOLD"
-set the treshold value for conversion to B/W, falling back to the default value 0x80 if not set. THRESHOLD must be in the interval <0; 255>, the lower value set, the more bright output created. Value may include a "0x" prefix, and the number will be read in base 16, a "0" prefix for base 8 (octal); otherwise, a 10 (decimal) base is taken.
-
-.IP "\-p"
+.TP
+.BR "\-t \fITHRESHOLD\fR"
+set the treshold value for conversion to B/W, falling back to the default value 0x80 if not set.
+\fITHRESHOLD\fR must be in the interval <0; 255>, the lower value set, the more bright output created.
+Value may include a "0x" prefix, and the number will be read in base 16, a "0" prefix for base 8 (octal);
+otherwise, a 10 (decimal) base is taken.
+.TP
+.BR \-p
 switch to photo mode (pre-process input files)
-
-.IP "\-o FILE"
+.TP
+.BR "\-o \fIFILE\fR"
 output file
 .nf
-With no FILE, or when FILE is -, write to standard output
-
+With no \fIFILE\fR, or when \fIFILE\fR is -, write to standard output
 .SH "EXIT STATUS"
-.B png2pos
-uses a common convention of zero (0) for success and non-zero (> 0) for error.
-
+png2pos uses a common convention of zero (0) for success and non-zero (> 0) for error.
 .SH EXAMPLES
-Command
-.P
-.RS
 .nf
 png2pos -o /dev/usb/lp0 -c -r -a R /tmp/lena.png /tmp/text.png
 .fi
-.RE
-.P
-will convert files lena.png and text.png into ESC/POS format. Output will be sent directly to printer (/dev/usb/lp0).
+.PP
+This command will convert files lena.png and text.png into ESC/POS format. Output will be sent directly to printer (/dev/usb/lp0).
 Images will be rotated by 180 degrees and right-aligned. At the end of job paper will be cut off.
-
 .SH BUGS
 No known bugs.
-
 .SH REPORTING BUGS
 Bug reports can be seen and new bugs could be reported at https://github.com/petrkutalek/png2pos/issues
-
 .SH AUTHOR
-.B png2pos
-has been written by Petr Kutalek <petr@kutalek.cz>.
-
+png2pos has been written by Petr Kutalek <petr@kutalek.cz>.
 .SH WWW
 https://github.com/petrkutalek/png2pos
-
 .SH COPYRIGHT
 Licensed under the MIT License:
-.P
+.PP
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-.P
+.PP
 - The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-.P
+.PP
 - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-.P
+.PP
 (c) 2012 - 2015 Petr Kutalek: png2pos
-
-.P
+.PP
 Some portions:
 .br
 (c) 2005 - 2014 Lode Vandevenne: LodePNG
